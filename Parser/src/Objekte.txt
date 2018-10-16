@@ -1,0 +1,23 @@
+Objekt
+	Name
+	Objekttyp (Abstract, Interface)
+			
+	Attribut 
+		Name
+		Datentyp (String, Integer,...)
+		Wert (Standard Wert etc)
+		Sichtbarkeit (private, public)
+	/Attribut
+	Beziehung
+		Referenz
+		Typ (Veerbung, 1:n; 1:1,....)
+		Bezeichnung
+	/Beziehung
+	Funktion
+		Name
+		Sichtbarkeit
+		Rückgabewert
+		Parameter
+	/Funktion
+/Objekt
+
