@@ -1,1 +1,24 @@
-Fabian ist ein Spast Fabian ist ein Spast
+Objekt
+	Name: Testobhjekt
+	Attibut1
+		Typ
+		Name
+		Wert
+	Attribut2
+	Attribut3	
+/Objekt
+Objekt
+	Name
+	Attibut1
+		Typ
+		Name
+		Wert
+	Attribut2
+	Attribut3	
+/Objekt
+Relation
+	Description
+	Typ
+	From(Object)
+	to
+/Relation
