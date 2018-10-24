@@ -5,6 +5,11 @@ pub struct Attribut {
 	pub value: String,
 }
 
+pub struct ObjectHelpper {
+	pub object: Object,
+	pub count: usize,
+}
+
 pub struct RelationObject<'a> {
 	pub description: String,
 	pub typ: String,			// Enum

@@ -5,7 +5,19 @@ use std::path::Path;
 mod lib;
 use std::io::BufReader;
 
-fn createObject(line: &Vec<&str>,mut lineCount: &i32) -> bool {
+fn createObject(line: &Vec<&str>,mut lineCount: &usize) -> lib::ObjectHelpper {
+	let attr2 = lib::Attribut{
+		name: String::from("Name2"),
+		typ: String::from("Typ2"),
+		value: String::from("Value2"),
+	};
+	let attrs = vec![attr2];
+	let obj = lib::Object{
+		name: String::from("Objectname"),
+		attributes: attrs,
+	};
+
+
 
 	let mut lineCount2 = *lineCount;
 	
@@ -15,7 +27,13 @@ fn createObject(line: &Vec<&str>,mut lineCount: &i32) -> bool {
 		println!("Kein ende {}", lineCount2);
 		
 	}
-	return false;
+	
+	let objectHelp = lib::ObjectHelpper{
+		object: obj,
+		count: lineCount2,	
+	};
+
+	return objectHelp;
 }
 
 
@@ -50,14 +68,27 @@ fn main() {
 	strings.push(word);
     }
     
-    for line in &strings {
+
+    while lineCount < strings.len()  {
+	
+	println!("{}: {}",lineCount, strings[lineCount]);
+	if(strings[lineCount] == "Object") {
+		println!("Juhu ein Object");
+		let obj = createObject(&strings,&lineCount);
+		lineCount = obj.count;
+	}
+	lineCount = lineCount + 1;
+    }
+
+    /*for line in &strings {
 	lineCount = lineCount + 1;
 	println!("{}: {}",lineCount, line);
 	if(line.trim() == "Object") {
 		println!("Juhu ein Object");
 		let obj = createObject(&strings,&lineCount);
+		lineCount = obj.count-1;
 	}
-    }
+    }*/
 }
 
 
