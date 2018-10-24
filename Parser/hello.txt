@@ -1,24 +1,28 @@
-Objekt
+Object
 	Name: Testobhjekt
 	Attibut1
-		Typ
-		Name
-		Wert
+		Name: Attributename
+		Typ: Attribute	
+		Wert: Attributewert 
 	Attribut2
-	Attribut3	
-/Objekt
-Objekt
-	Name
+		Name: Attributename2
+		Typ: Attribute2	
+		Wert: Attributewert2 
+/Object
+Object
+	Name: Testobhjekt2
 	Attibut1
-		Typ
-		Name
-		Wert
+		Name: Attributename22
+		Typ: Attribute22	
+		Wert: Attributewert22 
 	Attribut2
-	Attribut3	
-/Objekt
+		Name: Attributename222
+		Typ: Attribute2	
+		Wert: Attributewert222 
+/Object
 Relation
-	Description
-	Typ
-	From(Object)
-	to
+	Description: test
+	Typ: test
+	From: Testobhjekt
+	to: Testobhjekt2
 /Relation

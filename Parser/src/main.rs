@@ -5,6 +5,20 @@ use std::path::Path;
 mod lib;
 use std::io::BufReader;
 
+fn createObject(line: &Vec<&str>,mut lineCount: &i32) -> bool {
+
+	let mut lineCount2 = *lineCount;
+	
+	println!("{}",lineCount2);
+	while line[lineCount2 as usize] != "/Object" {
+		lineCount2 = lineCount2 + 1;
+		println!("Kein ende {}", lineCount2);
+		
+	}
+	return false;
+}
+
+
 fn main() {	
 
     // Create a path to the desired file
@@ -32,14 +46,17 @@ fn main() {
 
     let mut strings = vec![];	
 	
-    for word in s.split_whitespace() {
-			strings.push(word);
+    for word in s.lines() {
+	strings.push(word);
     }
     
-		println!("{}",strings[0]);
-    for word in strings {
-			lineCount = lineCount + 1;
-			println!("{}: {}",lineCount, word);
+    for line in &strings {
+	lineCount = lineCount + 1;
+	println!("{}: {}",lineCount, line);
+	if(line.trim() == "Object") {
+		println!("Juhu ein Object");
+		let obj = createObject(&strings,&lineCount);
+	}
     }
 }
 
@@ -66,7 +83,7 @@ fn main() {
 
 	
 
-	//let relas = vec![];
+	
 
 	let obj = lib::Object{
 		name: String::from("Objectname"),
