@@ -1,28 +1,32 @@
 Object
 	Name: Testobhjekt
-	Attibut1
+	Attribut
 		Name: Attributename
 		Typ: Attribute	
 		Wert: Attributewert 
-	Attribut2
+	/Attribut	
+	Attribut
 		Name: Attributename2
 		Typ: Attribute2	
 		Wert: Attributewert2 
+	/Attribut
 /Object
 Object
 	Name: Testobhjekt2
-	Attibut1
+	Attribut
 		Name: Attributename22
 		Typ: Attribute22	
 		Wert: Attributewert22 
-	Attribut2
+	/Attribut	
+	Attribut
 		Name: Attributename222
 		Typ: Attribute2	
 		Wert: Attributewert222 
+	/Attribut
 /Object
 Relation
 	Description: test
 	Typ: test
 	From: Testobhjekt
-	to: Testobhjekt2
+	To: Testobhjekt2
 /Relation
