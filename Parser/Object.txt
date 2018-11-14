@@ -1,0 +1,31 @@
+Object
+	Name: Tier
+	Attribut
+		Name: Alter
+		Typ: Integer	
+	/Attribut	
+	Attribut
+		Name: Farbe
+		Typ: Color	
+		Wert: RED 
+	/Attribut	
+/Object
+Object
+	Name: Hund
+	Attribut
+		Name: Farbe
+		Typ: Color	
+		Wert: WHITE 
+	/Attribut
+	Function
+		Name: bellen
+		Parameter: lautstärke: Integer
+		Return: void
+	/Function
+/Object
+Relation
+	Description: Ein Hund ist ein Tier
+	Typ: vererbung
+	From: Tier
+	To: Hund
+/Relation
