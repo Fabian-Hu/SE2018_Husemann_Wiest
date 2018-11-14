@@ -15,17 +15,17 @@ pub struct AttributHelper {
 	pub count: usize,
 }
 
-pub struct RelationHelper<'a> {
-	pub relation: RelationObject<'a>,
+pub struct RelationHelper{
+	pub relation: RelationObject,
 	pub count: usize,
 }
 
-pub struct RelationObject<'a>{
+pub struct RelationObject{
 	pub description: String,
 	pub typ: String,			// Enum
 	
-	pub from: &'a Object,
-	pub to: &'a Object,
+	pub from: String,
+	pub to: String,
 }
 
 pub struct Object {
@@ -33,13 +33,25 @@ pub struct Object {
 	pub attributes: Vec<Attribut>, 
 }
 
-pub fn printRelation(rela: &RelationObject) {
+pub fn printRelation(rela: &RelationObject,objList: &Vec<Object>) {
 	println!("RalationDescription: {}",rela.description);
 	println!("Ralationtyp: {}",rela.typ);
-	println!("\nFrom: ");
-	printObject(&rela.from);
-	println!("\nTo: ");
-	printObject(&rela.to);
+	
+	for obj in objList{
+		if obj.name == rela.from {
+			println!("\nFrom: ");
+			printObject(&obj);
+		}
+	}
+
+	for obj in objList{
+		if obj.name == rela.to {
+			println!("\nTo: ");
+			printObject(&obj);
+		}
+		
+	}
+	
 }
 
 pub fn printObject(obj: &Object) {

@@ -4,15 +4,12 @@ use std::io::prelude::*;
 use std::path::Path;
 mod lib;
 
-fn createRelation(line: &Vec<&str>,lineCount: &usize,objList: &Vec<&lib::Object>) -> lib::RelationHelper {
+fn createRelation(line: &Vec<&str>,lineCount: &usize) -> lib::RelationHelper {
 	let mut lineCount2 = *lineCount;
 	let mut relaDescription = "";
 	let mut relaTyp = "";
-	let mut relaFrom;
-	let mut relaTo;
-
-	let mut relaFromString = "";
-	let mut relaToString = "";
+	let mut relaFrom = "";
+	let mut relaTo = "";
 
 	while !line[lineCount2 as usize].contains("/Relation") {
 		lineCount2 = lineCount2 + 1;
@@ -33,25 +30,16 @@ fn createRelation(line: &Vec<&str>,lineCount: &usize,objList: &Vec<&lib::Object>
 		else if line[lineCount2].contains("From:") {
 			for split in line[lineCount2].split(": "){
 				if !split.contains("From") {
-					relaFromString = split;	
+					relaFrom = split;	
 				}
 			}				  
 		}
 		else if line[lineCount2].contains("To:") {
 			for split in line[lineCount2].split(": "){
 				if !split.contains("To") {
-					relaToString = split;	
+					relaTo = split;	
 				}
 			}				  
-		}
-	}
-	
-	for obj in objList {
-		if obj.name.contains(relaFromString) {
-			relaFrom = obj;
-		}
-		if obj.name.contains(relaToString) {
-			relaTo = obj;
 		}
 	}
 
@@ -59,8 +47,8 @@ fn createRelation(line: &Vec<&str>,lineCount: &usize,objList: &Vec<&lib::Object>
 	 	description: relaDescription.to_string(),
 	 	typ: relaTyp.to_string(),			
 	
-	 	from: relaFrom,
-	 	to: relaTo,
+	 	from: relaFrom.to_string(),
+	 	to: relaTo.to_string(),
 	};
 
 	let relationHelp = lib::RelationHelper{
@@ -192,7 +180,8 @@ fn main() {
 	*	Jeden Eintrag des Vectors durchgehen
 	*/
 	
-	let mut objList = vec![];
+	let mut objList: Vec<lib::Object> = vec![];
+	let mut relaList: Vec<lib::RelationObject> = vec![];
 
     while lineCount < strings.len()  {
 		if strings[lineCount].contains("Object") {
@@ -201,15 +190,15 @@ fn main() {
 			objList.push(obj.object);
 			lineCount = obj.count;
 		}
-		/*else if strings[lineCount].contains("Relation") {
+		else if strings[lineCount].contains("Relation") {
 			let relaHelper = createRelation(&strings,&lineCount);
-			lib::printRelation(&relaHelper.relation);
+			relaList.push(relaHelper.relation);
 			lineCount = relaHelper.count;
-		}*/
+		}
 		lineCount = lineCount + 1;
     }
 
-	for obj in objList {
-		lib::printObject(&obj);
+	for rela in relaList {
+		lib::printRelation(&rela, &objList);
 	}
 }
