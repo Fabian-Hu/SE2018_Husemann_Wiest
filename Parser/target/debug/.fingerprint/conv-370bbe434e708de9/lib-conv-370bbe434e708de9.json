@@ -1,0 +1,1 @@
+{"rustc":8726586168142681767,"features":"[\"custom_derive\", \"default\", \"std\"]","target":2728641962440273865,"profile":5989163284797048052,"path":13751444698698941666,"deps":[["custom_derive v0.1.7","custom_derive",13559177536167635444]],"local":[{"Precalculated":"0.3.3"}],"rustflags":[],"edition":"Edition2015"}

@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
 mod lib;
+mod draw;
 
 fn createFunction(line: &Vec<&str>,lineCount: &usize) -> lib::FunctionHelper {
 	let mut lineCount2 = *lineCount;
@@ -385,4 +386,6 @@ fn main() {
 			lib::printRelation(&rela, &objList);
 		}
 	}
+
+	draw::drawObject("Test.png".to_string(),&objList);
 }
