@@ -24,10 +24,8 @@ fn createFunction(line: &Vec<&str>,lineCount: &usize) -> lib::FunctionHelper {
 			}				  
 		}
 		else if line[lineCount2].contains("Parameter:") {
-			for split in line[lineCount2].split(": "){
-				if !split.contains("Parameter") {
-					funcParameter = split;	
-				}
+			for split in line[lineCount2].split("Parameter: "){
+				funcParameter = split;				
 			}				  
 		}	
 		else if line[lineCount2].contains("Return:") {

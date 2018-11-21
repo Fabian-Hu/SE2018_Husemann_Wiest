@@ -17,6 +17,21 @@ Object
 		Typ: Color	
 		Wert: WHITE 
 	/Attribut
+	Attribut
+		Name: Farbe
+		Typ: Color	
+		Wert: WHITE 
+	/Attribut
+	Attribut
+		Name: Farbe
+		Typ: Color	
+		Wert: WHITE 
+	/Attribut
+	Attribut
+		Name: Farbe
+		Typ: Color	
+		Wert: WHITE 
+	/Attribut
 	Function
 		Name: bellen
 		Parameter: lautstärke: Integer
