@@ -17,9 +17,10 @@ use draw::imageproc::drawing::{
     draw_filled_circle_mut
 };
 
+use self::rusttype::FontCollection;
+use self::rusttype::Scale;
 
 pub fn drawObject(path: String, objList: &Vec<lib::Object>) {
-	
 	let path = Path::new(&path);
 
     let red   = Rgb([255u8, 0u8,   0u8]);
@@ -28,27 +29,33 @@ pub fn drawObject(path: String, objList: &Vec<lib::Object>) {
     let white = Rgb([255u8, 255u8, 255u8]);
 	let black = Rgb([0u8, 0u8, 0u8]);
 
+	let font = Vec::from(include_bytes!("DejaVuSans.ttf") as &[u8]);
+	let font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
+	let fontHeight = 16.2;
+	let scale = Scale { x: fontHeight * 1.3, y: fontHeight };
+
 	let mut x:i32 = 60;
 	let mut y:i32 = 10;
-	let lineHight:i32 = 20;
-	let charLenght:i32 = 8;
+	let lineHeight:i32 = 22;
+	let charLenght:i32 = 14;
     let mut xCordinate = vec![];	
     let mut yCordinate = vec![];
 
 	let mut image = RgbImage::new(800, 800);
 	// Background
 	draw_filled_rect_mut(&mut image, Rect::at(0, 0).of_size(800, 800), white);
-
 	for obj in objList.iter() {
 		 // Draw a hollow rect within bounds
-		let mut length:i32 = 40;
-		let mut hight:i32 = 30;
+		let mut length:i32 = x;
+		let mut height:i32 = y;
 		let mut yCordinateFunction;
     	
-		// TEXT für Objectname
-		hight +=1;
+		// TEXT für Objectname	
+		draw_text_mut(&mut image, black, (x+lineHeight/4) as u32, (y+lineHeight/6) as u32, scale, &font, &obj.name.to_string());
+
+		height +=4;
 		for attr in obj.attributes.iter(){
-			hight += lineHight;
+			height += lineHeight;
 			let mut attrString = String::new();
 			attrString.push_str(&attr.name.to_string());
 			attrString.push_str(": ");
@@ -62,13 +69,13 @@ pub fn drawObject(path: String, objList: &Vec<lib::Object>) {
 				length = attrString.len() as i32 * charLenght;
 			}
 			//Komplettes Attribute printen;
+			draw_text_mut(&mut image, black, (x+lineHeight/4) as u32, (height+lineHeight/6) as u32, scale, &font, &attrString.to_string());
 		} 
-
-		yCordinateFunction = hight;
-		hight += 1;
+		yCordinateFunction = height + lineHeight;
+		height += 4;
 		
    	 	for func in obj.functions.iter(){
-			hight += lineHight;
+			height += lineHeight;
 			let mut funcString = String::new();
 			funcString.push_str(&func.name.to_string());
 			funcString.push_str("(");
@@ -85,21 +92,23 @@ pub fn drawObject(path: String, objList: &Vec<lib::Object>) {
 				length = funcString.len() as i32 * charLenght;
 			}
 			//Komplettes Attribute printen;
+			draw_text_mut(&mut image, black, (x+lineHeight/4) as u32, (height+lineHeight/6) as u32, scale, &font, &funcString.to_string());
 		} 
 		// Box
-		draw_hollow_rect_mut(&mut image, Rect::at(x, y).of_size(length as u32, hight as u32), black);
+		draw_hollow_rect_mut(&mut image, Rect::at(x, y).of_size((length-x) as u32, (height-y+lineHeight) as u32), black);
 		//Line zwischen Name und Attribut
-		draw_line_segment_mut(&mut image, (x as f32, (y+lineHight) as f32), ((x+length) as f32, (y+lineHight) as f32), black);
+		draw_line_segment_mut(&mut image, (x as f32, (y+lineHeight) as f32), ((length-1) as f32, (y+lineHeight) as f32), black);
 		// Line zwischen Attribut und Funktion
-		draw_line_segment_mut(&mut image, (x as f32, yCordinateFunction as f32), ((x+length) as f32, yCordinateFunction as f32), black);
+		draw_line_segment_mut(&mut image, (x as f32, yCordinateFunction as f32), ((length-1) as f32, yCordinateFunction as f32), black);
 		
 
-		xCordinate.push(x);
-		yCordinate.push(y);
-		x += 180;
-		y += 100;
+		xCordinate.push((x/2+length)/2);
+		yCordinate.push((height-y+lineHeight)/2+y);
+		
+		y = height+lineHeight+20;
 	}
-
-		
+	
+	draw_line_segment_mut(&mut image, (xCordinate[0] as f32, yCordinate[0] as f32), (xCordinate[1] as f32, yCordinate[1] as f32), red);
+	
 	image.save(path).unwrap();
 }

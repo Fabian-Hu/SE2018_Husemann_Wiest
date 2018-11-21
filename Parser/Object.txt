@@ -2,35 +2,46 @@ Object
 	Name: Tier
 	Attribut
 		Name: Alter
-		Typ: Integer	
+		Typ: Integer
 	/Attribut	
 	Attribut
 		Name: Farbe
-		Typ: Color	
-		Wert: RED 
+		Typ: Color
+		Wert: RED
+	/Attribut
+	Attribut
+		Name: Farbe
+		Typ: Color
+		Wert: RED
 	/Attribut	
 /Object
 Object
 	Name: Hund
 	Attribut
 		Name: Farbe
-		Typ: Color	
-		Wert: WHITE 
+		Typ: Color
 	/Attribut
 	Attribut
 		Name: Farbe
-		Typ: Color	
-		Wert: WHITE 
+		Typ: Color
+		Wert: RED
 	/Attribut
 	Attribut
 		Name: Farbe
-		Typ: Color	
-		Wert: WHITE 
+		Typ: Color
+		Wert: WHITE
 	/Attribut
+	Function
+		Name: bellen
+		Parameter: lautstärke: Integer
+		Return: void
+	/Function
+/Object
+Object
+	Name: Katze
 	Attribut
 		Name: Farbe
-		Typ: Color	
-		Wert: WHITE 
+		Typ: Color
 	/Attribut
 	Function
 		Name: bellen
