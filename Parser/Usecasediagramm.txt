@@ -1,0 +1,16 @@
+Usecasediagramm 
+Akteur
+	Name: Kunde
+/Akteur
+System
+	Name: Online-Shop
+	Usecase
+		Description: Artikel auswählen
+	/Usecase	
+	Usecase
+		Description: Anschrift eingeben
+	/Usecase	
+	Usecase
+		Description: Zahlungsmethode wählen
+	/Usecase
+/System

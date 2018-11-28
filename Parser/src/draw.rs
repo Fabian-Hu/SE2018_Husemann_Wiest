@@ -5,10 +5,12 @@ extern crate rusttype;
 
 use lib;
 use std::env;
+use std::collections::HashMap;
 use draw::image::{Rgb, RgbImage};
 use draw::imageproc::rect::Rect;
 use draw::imageproc::drawing::{
 	draw_text_mut,
+	draw_hollow_ellipse_mut,
     draw_cross_mut,
     draw_line_segment_mut,
     draw_hollow_rect_mut,
@@ -20,12 +22,10 @@ use draw::imageproc::drawing::{
 use self::rusttype::FontCollection;
 use self::rusttype::Scale;
 
-pub fn drawObject(path: String, objList: &Vec<lib::Object>) {
-	let path = Path::new(&path);
+//https://www.frustfrei-lernen.de/mathematik/lineare-funktion-zwei-punkte.html
 
-    let red   = Rgb([255u8, 0u8,   0u8]);
-    let green = Rgb([0u8,   255u8, 0u8]);
-    let blue  = Rgb([0u8,   0u8,   255u8]);
+pub fn drawClassDiagram(path: String, objList: &Vec<lib::Object>, relaList: &Vec<lib::RelationObject>) {
+	let path = Path::new(&path);
     let white = Rgb([255u8, 255u8, 255u8]);
 	let black = Rgb([0u8, 0u8, 0u8]);
 
@@ -38,8 +38,8 @@ pub fn drawObject(path: String, objList: &Vec<lib::Object>) {
 	let mut y:i32 = 10;
 	let lineHeight:i32 = 22;
 	let charLenght:i32 = 14;
-    let mut xCordinate = vec![];	
-    let mut yCordinate = vec![];
+    let mut xCordinate = HashMap::new();	
+    let mut yCordinate = HashMap::new();
 
 	let mut image = RgbImage::new(800, 800);
 	// Background
@@ -70,7 +70,8 @@ pub fn drawObject(path: String, objList: &Vec<lib::Object>) {
 			}
 			//Komplettes Attribute printen;
 			draw_text_mut(&mut image, black, (x+lineHeight/4) as u32, (height+lineHeight/6) as u32, scale, &font, &attrString.to_string());
-		} 
+		}
+ 
 		yCordinateFunction = height + lineHeight;
 		height += 4;
 		
@@ -102,13 +103,93 @@ pub fn drawObject(path: String, objList: &Vec<lib::Object>) {
 		draw_line_segment_mut(&mut image, (x as f32, yCordinateFunction as f32), ((length-1) as f32, yCordinateFunction as f32), black);
 		
 
-		xCordinate.push((x/2+length)/2);
-		yCordinate.push((height-y+lineHeight)/2+y);
+		xCordinate.insert(obj.name.to_string(),(x/2+length)/2);
+		yCordinate.insert(obj.name.to_string(),(height-y+lineHeight)/2+y);
 		
 		y = height+lineHeight+20;
 	}
 	
-	draw_line_segment_mut(&mut image, (xCordinate[0] as f32, yCordinate[0] as f32), (xCordinate[1] as f32, yCordinate[1] as f32), red);
+	for rela in relaList.iter() {
+		let mut lokalXTo = 0;
+		let mut lokalYTo = 0;
+		let mut lokalXFrom = 0;
+		let mut lokalYFrom = 0;
+		match xCordinate.get(&rela.to) {
+        	Some(&cordinate) => lokalXTo = cordinate,
+        	_ => println!(),
+    	}
+		match yCordinate.get(&rela.to) {
+        	Some(&cordinate) => lokalYTo = cordinate,
+        	_ => println!(),
+    	}
+		match xCordinate.get(&rela.from) {
+        	Some(&cordinate) => lokalXFrom = cordinate,
+        	_ => println!(),
+    	}
+		match yCordinate.get(&rela.from) {
+        	Some(&cordinate) => lokalYFrom = cordinate,
+        	_ => println!(),
+    	}
+
+		draw_line_segment_mut(&mut image, (lokalXTo as f32, lokalYTo as f32), (lokalXFrom as f32, lokalYFrom as f32), black);
+	}
+
+	image.save(path).unwrap();
+}
+
+pub fn drawUseCaseDiagram(path: String,akteur: &Vec<lib::Akteur>, system: &Vec<lib::System>) {
+	let path = Path::new(&path);
+	let black = Rgb([0u8, 0u8, 0u8]);	
+    let white = Rgb([255u8, 255u8, 255u8]);
+
+	let font = Vec::from(include_bytes!("DejaVuSans.ttf") as &[u8]);
+	let font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
+	let fontHeight = 16.2;
+	let scale = Scale { x: fontHeight * 1.3, y: fontHeight };	
+	let charLenght:i32 = 14;
+
+	let mut xCordinate = vec![];
+    let mut yCordinate = vec![];
+
+	let mut image = RgbImage::new(1600, 1600);
+	// Background
+	draw_filled_rect_mut(&mut image, Rect::at(0, 0).of_size(1600, 1600), white);
+
+	let sys = &system[0];
+
+	let mut lokalX = 300;
+	let mut lokalY = 220;
+	
+	let mut boxHeight = 40;
+	let mut boxLenght = 0;
+
+	//draw_hollow_ellipse_mut(&mut image, (100, 100), 140, 80, black);
+	for useCase in &sys.useCases{	
+		let lenght = (useCase.description.len() as i32) * charLenght;
+		draw_text_mut(&mut image, black, lokalX as u32, lokalY as u32 , scale, &font, &useCase.description);
+		lokalY += charLenght/2;
+		draw_hollow_ellipse_mut(&mut image, (lokalX+lenght/3, lokalY), (lenght/2) as i32, 50, black);
+			
+		xCordinate.push(lokalX);
+		yCordinate.push(lokalY);
+		lokalY += 100;
+
+		boxHeight += 120;
+		if (useCase.description.len() as i32 * charLenght) > boxLenght {
+			boxLenght = useCase.description.len() as i32 * charLenght;
+		}
+	}
+	// System
+	draw_hollow_rect_mut(&mut image, Rect::at(200, 100).of_size(((boxLenght + 80) as u32),boxHeight), black);
+
+	
+	draw_text_mut(&mut image, black, ((200 + (boxLenght + 80)/2)- (sys.name.len() as i32 * charLenght)/2) as u32 , 130 , scale, &font, &sys.name);
+	// Akteur
+    draw_hollow_circle_mut(&mut image, (100, (100 + (boxHeight/2)) as i32), 30, black);
+
+	for x in 0..xCordinate.len(){
+		draw_line_segment_mut(&mut image, (100 as f32, (100 + (boxHeight/2)) as f32), (xCordinate[x] as f32, yCordinate[x] as f32), black);
+	}
 	
 	image.save(path).unwrap();
 }

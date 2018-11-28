@@ -33,6 +33,27 @@ pub struct RelationHelper{
 	pub errorMsg: String,
 }
 
+pub struct AkteurHelper{
+	pub akteur: Akteur,
+	pub count: usize,
+	pub errorCount: usize,			
+	pub errorMsg: String,
+}
+
+pub struct UseCaseHelper{
+	pub useCase: UseCase,
+	pub count: usize,
+	pub errorCount: usize,			
+	pub errorMsg: String,
+}
+
+pub struct SystemHelper{
+	pub system: System,
+	pub count: usize,
+	pub errorCount: usize,			
+	pub errorMsg: String,
+}
+
 pub struct RelationObject{
 	pub description: String,
 	pub typ: String,			// Enum
@@ -51,6 +72,19 @@ pub struct Object {
 	pub name: String,
 	pub attributes: Vec<Attribut>, 
 	pub functions: Vec<Function>, 
+}
+
+pub struct System {
+	pub name: String,
+	pub useCases: Vec<UseCase>, 
+}
+
+pub struct Akteur {
+	pub name: String, 
+}
+
+pub struct UseCase {
+	pub description: String, 
 }
 
 pub fn printRelation(rela: &RelationObject,objList: &Vec<Object>) {

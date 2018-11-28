@@ -1,5 +1,6 @@
 use std::error::Error;
 use std::fs::File;
+use std::env;
 use std::io::prelude::*;
 use std::path::Path;
 mod lib;
@@ -37,7 +38,7 @@ fn createFunction(line: &Vec<&str>,lineCount: &usize) -> lib::FunctionHelper {
 		}
 		else if line[lineCount2].contains("/Function"){}
 		else {
-			funcErrorMsg.push_str("Fehler in Funktion an der Zeile: ");
+			funcErrorMsg.push_str(" Fehler in Funktion an der Zeile: ");
 			funcErrorMsg.push_str(&(lineCount2+1).to_string());
 			funcErrorMsg.push_str(" ");
 			funcErrorMsg.push_str(&line[lineCount2].to_string());
@@ -70,7 +71,7 @@ fn createFunction(line: &Vec<&str>,lineCount: &usize) -> lib::FunctionHelper {
 }
 
 
-fn createRelation(line: &Vec<&str>,lineCount: &usize) -> lib::RelationHelper {
+fn createRelation(line: &Vec<&str>,lineCount: &usize, objList: &Vec<lib::Object>) -> lib::RelationHelper {
 	let mut lineCount2 = *lineCount;
 	let mut relaDescription = "";
 	let mut relaTyp = "";
@@ -112,12 +113,38 @@ fn createRelation(line: &Vec<&str>,lineCount: &usize) -> lib::RelationHelper {
 		}
 		else if line[lineCount2].contains("/Relation"){}
 		else {
-			funcErrorMsg.push_str("Fehler in Relation an der Zeile: ");
+			funcErrorMsg.push_str(" Fehler in Relation an der Zeile: ");
 			funcErrorMsg.push_str(&(lineCount2+1).to_string());
 			funcErrorMsg.push_str(" ");
 			funcErrorMsg.push_str(&line[lineCount2].to_string());
 			funcErrorCount = 1;
 		}
+	}
+	
+	let mut lokalErrorCount = 1;
+	for obj in objList.iter() {
+		if obj.name == relaTo {
+			lokalErrorCount = 0
+		}	
+	}
+	if lokalErrorCount == 1 {
+		funcErrorMsg.push_str("Zeile: ");
+		funcErrorMsg.push_str(&lineCount2.to_string());
+ 		funcErrorMsg.push_str(" Fehler: Das angegebene To ist nicht vorhanden");	
+		funcErrorCount = 1;
+	}
+
+	let mut lokalErrorCount2 = 1;
+	for obj in objList.iter() {
+		if obj.name == relaFrom {
+			lokalErrorCount2 = 0
+		}	
+	}
+	if lokalErrorCount2 == 1 {
+		funcErrorMsg.push_str("Zeile: ");
+		funcErrorMsg.push_str(&lineCount2.to_string());
+ 		funcErrorMsg.push_str(" Fehler: Das angegebene From ist nicht vorhanden");	
+		funcErrorCount = 1;
 	}
 
 	if relaTyp == "" && funcErrorCount == 0{
@@ -301,14 +328,167 @@ fn createObject(line: &Vec<&str>,lineCount: &usize) -> lib::ObjectHelper {
 	return objectHelp;
 }
 
+fn createAkteur(line: &Vec<&str>,lineCount: &usize) -> lib::AkteurHelper {
+	let mut lineCount2 = *lineCount;
+	let mut aktName = "";	
+	let mut funcErrorCount = 0;
+	let mut funcErrorMsg  = String::new();
+
+	while !line[lineCount2 as usize].contains("/Akteur") && funcErrorCount == 0 {
+		lineCount2 = lineCount2 + 1;
+	 	if line[lineCount2].contains("Name:") {
+			for split in line[lineCount2].split(": "){
+				if !split.contains("Name") {
+					aktName = split;	
+				}
+			}				  
+		}else if line[lineCount2].contains("/Akteur"){}
+		else {
+			funcErrorMsg.push_str("Fehler im Akteur an der Zeile: ");
+			funcErrorMsg.push_str(&(lineCount2+1).to_string());
+			funcErrorMsg.push_str(" ");
+			funcErrorMsg.push_str(&line[lineCount2].to_string());
+			funcErrorCount = 1;
+		}			
+	}
+	
+	if aktName == "" && funcErrorCount == 0 {
+		funcErrorMsg.push_str("Zeile: ");
+		funcErrorMsg.push_str(&lineCount2.to_string());
+ 		funcErrorMsg.push_str(" Fehler: Der Akteur hat keinen Name: !");	
+		funcErrorCount = 1;
+	}
+
+	let akt = lib::Akteur{
+		name: aktName.to_string(),
+	};
+
+	let akteurHelp = lib::AkteurHelper{
+		akteur: akt,
+		count: lineCount2,	
+		errorCount: funcErrorCount,			
+		errorMsg: funcErrorMsg.to_string(),
+	};
+	return akteurHelp;
+}
+
+fn createUseCase(line: &Vec<&str>,lineCount: &usize) -> lib::UseCaseHelper {
+	let mut lineCount2 = *lineCount;
+	let mut description = "";	
+	let mut funcErrorCount = 0;
+	let mut funcErrorMsg  = String::new();
+
+	while !line[lineCount2 as usize].contains("/Usecase") && funcErrorCount == 0 {
+		lineCount2 = lineCount2 + 1;
+	 	if line[lineCount2].contains("Description:") {
+			for split in line[lineCount2].split(": "){
+				if !split.contains("Description") {
+					description = split;	
+				}
+			}				  
+		}else if line[lineCount2].contains("/Usecase"){}
+		else {
+			funcErrorMsg.push_str("Fehler in Usecase an der Zeile: ");
+			funcErrorMsg.push_str(&(lineCount2+1).to_string());
+			funcErrorMsg.push_str(" ");
+			funcErrorMsg.push_str(&line[lineCount2].to_string());
+			funcErrorCount = 1;
+		}			
+	}
+	
+	if description == "" && funcErrorCount == 0 {
+		funcErrorMsg.push_str("Zeile: ");
+		funcErrorMsg.push_str(&lineCount2.to_string());
+ 		funcErrorMsg.push_str(" Fehler: Das Usecase hat keine Description: !");	
+		funcErrorCount = 1;
+	}
+
+	let useCase = lib::UseCase{
+		description: description.to_string(),
+	};
+
+	let useHelp = lib::UseCaseHelper{
+		useCase: useCase,
+		count: lineCount2,	
+		errorCount: funcErrorCount,			
+		errorMsg: funcErrorMsg.to_string(),
+	};
+	return useHelp;
+}
+
+fn createSystem(line: &Vec<&str>,lineCount: &usize) -> lib::SystemHelper {
+	let mut lineCount2 = *lineCount;
+	let mut sysName = "";	
+	let mut funcErrorCount = 0;
+	let mut funcErrorMsg  = String::new();
+	let mut useCaseList: Vec<lib::UseCase> = vec![];
+
+	while !line[lineCount2 as usize].contains("/System") && funcErrorCount == 0 {
+		lineCount2 = lineCount2 + 1;
+	 	if line[lineCount2].contains("Name:") {
+			for split in line[lineCount2].split(": "){
+				if !split.contains("Name") {
+					sysName = split;	
+				}
+			}				  
+		}else if line[lineCount2].contains("Usecase") {
+			let useHelper = createUseCase(&line,&lineCount2);
+			if useHelper.errorCount != 0 {
+				print!("{}",useHelper.errorMsg);
+				funcErrorCount = 1;
+			}
+			useCaseList.push(useHelper.useCase);
+			lineCount2 = useHelper.count;		  
+		}else if line[lineCount2].contains("/System"){
+		}else {
+			funcErrorMsg.push_str("Fehler in Usecase an der Zeile: ");
+			funcErrorMsg.push_str(&(lineCount2+1).to_string());
+			funcErrorMsg.push_str(" ");
+			funcErrorMsg.push_str(&line[lineCount2].to_string());
+			funcErrorCount = 1;
+		}	
+	}
+	
+	if sysName == "" && funcErrorCount == 0 {
+		funcErrorMsg.push_str("Zeile: ");
+		funcErrorMsg.push_str(&lineCount2.to_string());
+ 		funcErrorMsg.push_str(" Fehler: Das Objekt hat keinen Name: !");	
+		funcErrorCount = 1;
+	}
+
+	let sys = lib::System{
+		name: sysName.to_string(),
+		useCases: useCaseList,
+	};
+
+	let systemHelp = lib::SystemHelper{
+		system: sys,
+		count: lineCount2,	
+		errorCount: funcErrorCount,			
+		errorMsg: funcErrorMsg.to_string(),
+	};
+	return systemHelp;
+}
 
 fn main() {	
+	let args: Vec<String> = env::args().collect();
+	
+	if args.len() < 3 {
+		panic!("Kein Dateinamen angegeben!")
+	}	
+	if !args[1].contains(".txt") {
+		panic!("Das erste Argument muss auf .txt enden")
+	}
+	if !args[2].contains(".png") {
+		panic!("Das zweite Argument muss auf .png enden")
+	}
+	
 	/*
 	*  Datei einlesen und überprüfen
 	*/
 
     // Create a path to the desired file
-    let path = Path::new("Object.txt");
+    let path = Path::new(&args[1]);
     let display = path.display();
 
     // Open the path in read-only mode, returns `io::Result<File>`
@@ -346,44 +526,81 @@ fn main() {
 	let mut objList: Vec<lib::Object> = vec![];
 	let mut relaList: Vec<lib::RelationObject> = vec![];
 	let mut errorCounter = 0;
+	let mut diagramTyp = "";
+	let mut akteur: Vec<lib::Akteur> = vec![]; 
+	let mut system: Vec<lib::System> = vec![];
 
+	if strings[0].contains("Klassendiagramm") {
+			diagramTyp = "Klassendiagramm";
+			lineCount = lineCount + 1;
+	}else if strings[0].contains("Usecasediagramm"){
+			diagramTyp = "Usecasediagramm";
+			lineCount = lineCount + 1;
+	}
+	
     while lineCount < strings.len() && errorCounter == 0  {
-		if strings[lineCount].contains("Object") {
-			let objHelper = createObject(&strings,&lineCount);
-			if objHelper.errorCount != 0 {
-				print!("{}",objHelper.errorMsg);
+		if diagramTyp ==  "Klassendiagramm" {
+			if strings[lineCount].contains("Object") {
+				let objHelper = createObject(&strings,&lineCount);
+				if objHelper.errorCount != 0 {
+					print!("{}",objHelper.errorMsg);
+					errorCounter = 1;
+				}
+				println!("");
+				objList.push(objHelper.object);
+				lineCount = objHelper.count;
+			}
+			else if strings[lineCount].contains("Relation") {
+				let relaHelper = createRelation(&strings,&lineCount,&objList);
+				if relaHelper.errorCount != 0 {
+					print!("{}",relaHelper.errorMsg);
+					errorCounter = 1;
+				}
+				relaList.push(relaHelper.relation);
+				lineCount = relaHelper.count;
+			}
+			else {
+				print!("Fehler in der Datei an der Zeile: ");
+				print!("{} ",&(lineCount+1).to_string());
+				println!("{} ",&strings[lineCount].to_string());
+				errorCounter = 1;
+			}			
+		} else if diagramTyp == "Usecasediagramm" {
+			if strings[lineCount].contains("Akteur") {
+				let aktHelper = createAkteur(&strings,&lineCount);
+				if aktHelper.errorCount != 0 {
+					print!("{}",aktHelper.errorMsg);
+					errorCounter = 1;
+				}
+				println!("");
+				akteur.push(aktHelper.akteur);
+				lineCount = aktHelper.count;
+			}else if strings[lineCount].contains("System") {
+				let sysHelper = createSystem(&strings,&lineCount);
+				if sysHelper.errorCount != 0 {
+					print!("{}",sysHelper.errorMsg);
+					errorCounter = 1;
+				}
+				println!("");
+				system.push(sysHelper.system);				
+				lineCount = sysHelper.count;
+			}else {
+				print!("Fehler in der Datei an der Zeile: ");
+				print!("{} ",&(lineCount+1).to_string());
+				println!("{} ",&strings[lineCount].to_string());
 				errorCounter = 1;
 			}
-			println!("");
-			objList.push(objHelper.object);
-			lineCount = objHelper.count;
 		}
-		else if strings[lineCount].contains("Relation") {
-			let relaHelper = createRelation(&strings,&lineCount);
-			if relaHelper.errorCount != 0 {
-				print!("{}",relaHelper.errorMsg);
-				errorCounter = 1;
-			}
-			relaList.push(relaHelper.relation);
-			lineCount = relaHelper.count;
-		}
-		else {
-			print!("Fehler in der Datei an der Zeile: ");
-			print!("{} ",&(lineCount+1).to_string());
-			println!("{} ",&strings[lineCount].to_string());
-			errorCounter = 1;
-		}	
-		
 		lineCount = lineCount + 1;
     }
-	if errorCounter == 0 {
-		for obj in &objList {
-			lib::printObject(&obj);
-		}
-		for rela in relaList {
-			lib::printRelation(&rela, &objList);
+
+	if errorCounter == 0 {	
+		if diagramTyp == "Klassendiagramm" {
+			draw::drawClassDiagram(args[2].to_string(),&objList,&relaList);
+		}else if diagramTyp == "Usecasediagramm"{
+			draw::drawUseCaseDiagram(args[2].to_string(),&akteur,&system);
 		}
 	}
 
-	draw::drawObject("Test.png".to_string(),&objList);
+	
 }
