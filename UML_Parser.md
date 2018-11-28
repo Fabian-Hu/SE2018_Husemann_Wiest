@@ -10,7 +10,7 @@ Die Software wurde in der Programmiersprache Rust umgesetzt. Zur Erstellung von 
 
 ### Bedienung
 
-##### Textuelle Strukturierung
+##### Textuelle Strukturierung - Klassendiagramm
 
 *   Die Textstruktur orientiert sich an XML, ist allerdings hinsichtlich Syntax frei von uns interpretiert
 *   Gülting sind folgende Tags
@@ -113,6 +113,54 @@ Relation
 	From: Tier
 	To: Hund
 /Relation
+```
+##### Textuelle Strukturierung - Use Case-Diagramm
+
+Die Textstruktur orientiert sich an XML, ist allerdings hinsichtlich Syntax frei von uns interpretiert
+*   Gülting sind folgende Tags
+
+    | Tag      | Schließendes Tag | Beschreibung                     | Gültig in Tag |
+    |----------|------------------|----------------------------------|-----------|
+    | Akteur   | /Akteur       | Öffnet einen neuen Akteur         | /         |
+    | System | /System        | Öffnet das System zum Akteur        | /         |
+    | Usecase | /Usecase        | Öffnet ein Use Case im System       | /         |
+
+    
+* Gültig sind folgende Bezeichner
+    *   Tag Akteur
+
+    | Bezeichner | Beschreibung      | Gültige Werte |
+    |------------|-------------------|---------------|
+    | Name:      | Name des Akteurs | String        |
+    
+    * Tag System
+    
+    | Bezeichner | Beschreibung               | Gültige Werte |
+    |------------|----------------------------|---------------|
+    | Name:      | Bezeichnung des Systems  | String        |
+    
+    * Tag Usecase
+    
+    | Bezeichner | Beschreibung               | Gültige Werte |
+    |------------|----------------------------|---------------|
+    | Name:      | Bescrheibung des Use Case  | String        |
+    
+```xml
+Akteur
+	Name: Kunde
+/Akteur
+System
+	Name: Online-Shop
+	Usecase
+		Description: Artikel auswählen
+	/Usecase	
+	Usecase
+		Description: Anschrift eingeben
+	/Usecase	
+	Usecase
+		Description: Zahlungsmethode wählen
+	/Usecase
+/System
 ```
 
 
