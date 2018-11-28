@@ -156,7 +156,7 @@ pub fn drawUseCaseDiagram(path: String,akteur: &Vec<lib::Akteur>, system: &Vec<l
 	draw_filled_rect_mut(&mut image, Rect::at(0, 0).of_size(1600, 1600), white);
 
 	let sys = &system[0];
-
+	let akt = &akteur[0];
 	let mut lokalX = 300;
 	let mut lokalY = 220;
 	
@@ -185,7 +185,9 @@ pub fn drawUseCaseDiagram(path: String,akteur: &Vec<lib::Akteur>, system: &Vec<l
 	
 	draw_text_mut(&mut image, black, ((200 + (boxLenght + 80)/2)- (sys.name.len() as i32 * charLenght)/2) as u32 , 130 , scale, &font, &sys.name);
 	// Akteur
-    draw_hollow_circle_mut(&mut image, (100, (100 + (boxHeight/2)) as i32), 30, black);
+   	draw_hollow_circle_mut(&mut image, (100, (100 + (boxHeight/2)) as i32), 30, black);
+	
+	draw_text_mut(&mut image, black, 70, ((100 + (boxHeight/2))-50) as u32 , scale, &font, &akt.name);
 
 	for x in 0..xCordinate.len(){
 		draw_line_segment_mut(&mut image, (100 as f32, (100 + (boxHeight/2)) as f32), (xCordinate[x] as f32, yCordinate[x] as f32), black);
