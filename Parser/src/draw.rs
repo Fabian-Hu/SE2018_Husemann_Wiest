@@ -27,6 +27,7 @@ use self::rusttype::Scale;
 pub fn drawClassDiagram(path: String, objList: &Vec<lib::Object>, relaList: &Vec<lib::RelationObject>) {
 	let path = Path::new(&path);
     let white = Rgb([255u8, 255u8, 255u8]);
+	 let red = Rgb([255u8, 0u8, 0u8]);
 	let black = Rgb([0u8, 0u8, 0u8]);
 
 	let font = Vec::from(include_bytes!("DejaVuSans.ttf") as &[u8]);
@@ -131,7 +132,28 @@ pub fn drawClassDiagram(path: String, objList: &Vec<lib::Object>, relaList: &Vec
         	_ => println!(),
     	}
 
-		draw_line_segment_mut(&mut image, (lokalXTo as f32, lokalYTo as f32), (lokalXFrom as f32, lokalYFrom as f32), black);
+		//draw_line_segment_mut(&mut image, (lokalXTo as f32, lokalYTo as f32), (lokalXFrom as f32, lokalYFrom as f32), black);
+		// pub fn drawDashedLine(image , (lokalXTo , lokalYTo), (lokalXFrom, lokalYFrom), distance)
+		let distance = 5.0; 
+		let dirVec = vec![(lokalXTo-lokalXFrom),(lokalYTo-lokalYFrom),0];
+		let vecLenght = ((dirVec[0]*dirVec[0]+dirVec[1]*dirVec[1])as f64).sqrt();
+		let unitVec = vec![((dirVec[0] as f64) * (distance/vecLenght)),((dirVec[1] as f64) * (distance/vecLenght))];
+		let diffX = lokalXTo - lokalXFrom;
+		let diffY = lokalYTo - lokalYFrom;
+		let hypotenuse = ((diffX*diffX+diffY*diffY) as f64).sqrt();
+		let len = hypotenuse / distance;
+		println!("{}",hypotenuse);
+		let mut altVec = vec![lokalXFrom as f64,lokalYFrom as f64];
+		for x in 0..len as i32{		
+			let newVec = vec![((altVec[0] as f64) + unitVec[0]),((altVec[1] as f64) + unitVec[1])];
+			if x % 2 > 0 {			
+				draw_line_segment_mut(&mut image, (newVec[0] as f32, newVec[1] as f32), (altVec[0] as f32, altVec[1] as f32), black);
+			}
+			altVec = newVec;
+		}
+		//draw_line_segment_mut(&mut image, (lokalXTo as f32, lokalYTo as f32), (lokalXFrom as f32, lokalYFrom as f32), black);
+		
+		// Gestrichelte LineCode Ende
 	}
 
 	image.save(path).unwrap();
