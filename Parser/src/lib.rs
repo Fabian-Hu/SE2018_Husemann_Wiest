@@ -1,3 +1,9 @@
+pub enum RelaTyp {
+	Fehler,
+	Vererbung,
+	Kennt,
+	Abhaengigkeit,	
+}
 
 pub struct Attribut {
 	pub name: String,
@@ -56,7 +62,7 @@ pub struct SystemHelper{
 
 pub struct RelationObject{
 	pub description: String,
-	pub typ: String,			// Enum
+	pub typ: RelaTyp,			// Enum
 	
 	pub from: String,
 	pub to: String,
@@ -89,7 +95,7 @@ pub struct UseCase {
 
 pub fn printRelation(rela: &RelationObject,objList: &Vec<Object>) {
 	println!("RalationDescription: {}",rela.description);
-	println!("Ralationtyp: {}",rela.typ);
+	//println!("Ralationtyp: {}",rela.typ);
 	
 	for obj in objList{
 		if obj.name.to_string() == rela.from.to_string() {

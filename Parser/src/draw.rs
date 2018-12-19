@@ -224,16 +224,11 @@ pub fn drawClassDiagram(path: String, objList: &Vec<lib::Object>, relaList: &Vec
         	_ => println!(),
     	}
 
-		println!("{}",rela.typ);
-		
-		if rela.typ.contains("Vererbung"){
-			draw_line_with(&mut image,lokalXFrom, lokalXTo, lokalYFrom ,lokalYTo);
-		}else if rela.typ.contains("Strichel"){
-			draw_dashed_line_with(&mut image,lokalXFrom, lokalXTo, lokalYFrom ,lokalYTo);
-		}else if rela.typ.contains("StrichelVererbung"){
-			draw_dashed_line(&mut image,lokalXFrom, lokalXTo, lokalYFrom ,lokalYTo);
-		}else if rela.typ.contains("Kennt"){
-			draw_line_segment_mut(&mut image, (lokalXFrom, lokalYFrom), (lokalXTo, lokalYTo), black);
+		match rela.typ{
+			lib::RelaTyp::Vererbung => draw_line_with(&mut image,lokalXFrom, lokalXTo, lokalYFrom ,lokalYTo),
+			lib::RelaTyp::Kennt => draw_line_segment_mut(&mut image, (lokalXFrom, lokalYFrom), (lokalXTo, lokalYTo), black),
+			lib::RelaTyp::Abhaengigkeit => draw_dashed_line_with(&mut image,lokalXFrom, lokalXTo, lokalYFrom ,lokalYTo),
+			_ => println!("Es ist ein Fehler beim Zeichnen bei den Relationen"),
 		}		
 		
 	}

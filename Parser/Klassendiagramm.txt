@@ -52,13 +52,13 @@ Object
 /Object
 Relation
 	Description: Ein Hund ist ein Tier
-	Typ: vererbung
+	Typ: Abhängigkeit
 	From: Tier
 	To: Hund
 /Relation
 Relation
 	Description: Ein Hund ist ein Tier
 	Typ: Vererbung
-	From: Tier
+	From: Hund
 	To: Katze
 /Relation

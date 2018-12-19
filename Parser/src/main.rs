@@ -44,7 +44,6 @@ pub fn build_ui(application: &gtk::Application) {
                                               .expect("Couldn't get builder");
     let parsedImage: gtk::Image = builder.get_object("parsedImage")
                                               .expect("Couldn't get builder");
-    
     //parsedImage = gtk_image_new_from_file("test.png");
 
     let window_weak = window.downgrade();
@@ -61,16 +60,17 @@ pub fn build_ui(application: &gtk::Application) {
         if file_chooser.run() == gtk::ResponseType::Ok.into() {
             let filename = file_chooser.get_filename().expect("Couldn't get filename");
             let file = File::open(&filename).expect("Couldn't open file");
-
-            let mut reader = BufReader::new(file);
-            let mut contents = String::new();
+			let mut contents = String::new();
+            let mut reader = BufReader::new(file);		 
             let _ = reader.read_to_string(&mut contents);
-
             text_view.get_buffer().expect("Couldn't get window").set_text(&contents);
-        }
+			parseString(&contents);
+		}
 
         file_chooser.destroy();
     });
+
+
 
     window.connect_delete_event(|win, _| {
         win.destroy();
@@ -80,6 +80,99 @@ pub fn build_ui(application: &gtk::Application) {
     window.show_all();
 }
 
+fn parseString(s: &String) {
+	let mut lineCount = 0;
+    let mut strings = vec![];	
+	
+    for word in s.lines() {
+		strings.push(word);
+    }
+    
+	/*
+	*	Jeden Eintrag des Vectors durchgehen
+	*/
+	
+	let mut objList: Vec<lib::Object> = vec![];
+	let mut relaList: Vec<lib::RelationObject> = vec![];
+	let mut errorCounter = 0;
+	let mut diagramTyp = "";
+	let mut akteur: Vec<lib::Akteur> = vec![]; 
+	let mut system: Vec<lib::System> = vec![];
+
+	if strings[0].contains("Klassendiagramm") {
+			diagramTyp = "Klassendiagramm";
+			lineCount = lineCount + 1;
+	}else if strings[0].contains("Usecasediagramm"){
+			diagramTyp = "Usecasediagramm";
+			lineCount = lineCount + 1;
+	}
+	
+    while lineCount < strings.len() && errorCounter == 0  {
+		if diagramTyp ==  "Klassendiagramm" {
+			if strings[lineCount].contains("Object") {
+				let objHelper = createObject(&strings,&lineCount);
+				if objHelper.errorCount != 0 {
+					print!("{}",objHelper.errorMsg);
+					errorCounter = 1;
+				}
+				println!("");
+				objList.push(objHelper.object);
+				lineCount = objHelper.count;
+			}
+			else if strings[lineCount].contains("Relation") {
+				let relaHelper = createRelation(&strings,&lineCount,&objList);
+				if relaHelper.errorCount != 0 {
+					print!("{}",relaHelper.errorMsg);
+					errorCounter = 1;
+				}
+				relaList.push(relaHelper.relation);
+				lineCount = relaHelper.count;
+			}
+			else {
+				print!("Fehler in der Datei an der Zeile: ");
+				print!("{} ",&(lineCount+1).to_string());
+				println!("{} ",&strings[lineCount].to_string());
+				errorCounter = 1;
+			}			
+		} else if diagramTyp == "Usecasediagramm" {
+			if strings[lineCount].contains("Akteur") {
+				let aktHelper = createAkteur(&strings,&lineCount);
+				if aktHelper.errorCount != 0 {
+					print!("{}",aktHelper.errorMsg);
+					errorCounter = 1;
+				}
+				println!("");
+				akteur.push(aktHelper.akteur);
+				lineCount = aktHelper.count;
+			}else if strings[lineCount].contains("System") {
+				let sysHelper = createSystem(&strings,&lineCount);
+				if sysHelper.errorCount != 0 {
+					print!("{}",sysHelper.errorMsg);
+					errorCounter = 1;
+				}
+				println!("");
+				system.push(sysHelper.system);				
+				lineCount = sysHelper.count;
+			}else {
+				print!("Fehler in der Datei an der Zeile: ");
+				print!("{} ",&(lineCount+1).to_string());
+				println!("{} ",&strings[lineCount].to_string());
+				errorCounter = 1;
+			}
+		}
+		lineCount = lineCount + 1;
+    }
+
+	if errorCounter == 0 {	
+		if diagramTyp == "Klassendiagramm" {
+			draw::drawClassDiagram("Klassendiagramm.png".to_string(),&objList,&relaList);
+		}else if diagramTyp == "Usecasediagramm"{
+			draw::drawUseCaseDiagram("UseCaseDiagramm.png".to_string(),&akteur,&system);
+		}
+	}
+
+	println!("Der Parser war Erfolgreich");
+}
 fn createFunction(line: &Vec<&str>,lineCount: &usize) -> lib::FunctionHelper {
 	let mut lineCount2 = *lineCount;
 	let mut funcName = "";
@@ -242,9 +335,19 @@ fn createRelation(line: &Vec<&str>,lineCount: &usize, objList: &Vec<lib::Object>
 		funcErrorCount = 1;
 	}
 
+	let mut rela_typ = lib::RelaTyp::Fehler;
+
+	if relaTyp.contains("Vererbung"){
+		rela_typ = lib::RelaTyp::Vererbung;
+	}else if relaTyp.contains("Kennt"){
+		rela_typ = lib::RelaTyp::Kennt;
+	}else if relaTyp.contains("Abhängigkeit"){
+		rela_typ = lib::RelaTyp::Abhaengigkeit;
+	}
+
 	let relationObject = lib::RelationObject {
 	 	description: relaDescription.to_string(),
-	 	typ: relaTyp.to_string(),			
+	 	typ: rela_typ,			
 	
 	 	from: relaFrom.to_string(),
 	 	to: relaTo.to_string(),
@@ -555,138 +658,4 @@ fn main() {
     application.connect_activate(|_| {});
 
     application.run(&args().collect::<Vec<_>>());
-
-	
-	let args: Vec<String> = env::args().collect();
-	
-	if args.len() < 3 {
-		panic!("Kein Dateinamen angegeben!")
-	}	
-	if !args[1].contains(".txt") {
-		panic!("Das erste Argument muss auf .txt enden")
-	}
-	if !args[2].contains(".png") {
-		panic!("Das zweite Argument muss auf .png enden")
-	}
-	
-	/*
-	*  Datei einlesen und überprüfen
-	*/
-
-    // Create a path to the desired file
-    let path = Path::new(&args[1]);
-    let display = path.display();
-
-    // Open the path in read-only mode, returns `io::Result<File>`
-    let mut file = match File::open(&path) {
-        // The `description` method of `io::Error` returns a string that
-        // describes the error
-        Err(why) => panic!("couldn't open {}: {}", display,
-                                                   why.description()),
-        Ok(file) => file,
-    };
-
-    // Read the file contents into a string, returns `io::Result<usize>`
-    let mut s = String::new();
-    match file.read_to_string(&mut s) {
-        Err(why) => panic!("couldn't read {}: {}", display,
-                                                   why.description()),
-        Ok(_) => println!("File Found"),
-    }
-	
-	/*
-	*	Jede Zeile in einen Vector<String> pushen
-	*/
-
-    let mut lineCount = 0;
-    let mut strings = vec![];	
-	
-    for word in s.lines() {
-		strings.push(word);
-    }
-    
-	/*
-	*	Jeden Eintrag des Vectors durchgehen
-	*/
-	
-	let mut objList: Vec<lib::Object> = vec![];
-	let mut relaList: Vec<lib::RelationObject> = vec![];
-	let mut errorCounter = 0;
-	let mut diagramTyp = "";
-	let mut akteur: Vec<lib::Akteur> = vec![]; 
-	let mut system: Vec<lib::System> = vec![];
-
-	if strings[0].contains("Klassendiagramm") {
-			diagramTyp = "Klassendiagramm";
-			lineCount = lineCount + 1;
-	}else if strings[0].contains("Usecasediagramm"){
-			diagramTyp = "Usecasediagramm";
-			lineCount = lineCount + 1;
-	}
-	
-    while lineCount < strings.len() && errorCounter == 0  {
-		if diagramTyp ==  "Klassendiagramm" {
-			if strings[lineCount].contains("Object") {
-				let objHelper = createObject(&strings,&lineCount);
-				if objHelper.errorCount != 0 {
-					print!("{}",objHelper.errorMsg);
-					errorCounter = 1;
-				}
-				println!("");
-				objList.push(objHelper.object);
-				lineCount = objHelper.count;
-			}
-			else if strings[lineCount].contains("Relation") {
-				let relaHelper = createRelation(&strings,&lineCount,&objList);
-				if relaHelper.errorCount != 0 {
-					print!("{}",relaHelper.errorMsg);
-					errorCounter = 1;
-				}
-				relaList.push(relaHelper.relation);
-				lineCount = relaHelper.count;
-			}
-			else {
-				print!("Fehler in der Datei an der Zeile: ");
-				print!("{} ",&(lineCount+1).to_string());
-				println!("{} ",&strings[lineCount].to_string());
-				errorCounter = 1;
-			}			
-		} else if diagramTyp == "Usecasediagramm" {
-			if strings[lineCount].contains("Akteur") {
-				let aktHelper = createAkteur(&strings,&lineCount);
-				if aktHelper.errorCount != 0 {
-					print!("{}",aktHelper.errorMsg);
-					errorCounter = 1;
-				}
-				println!("");
-				akteur.push(aktHelper.akteur);
-				lineCount = aktHelper.count;
-			}else if strings[lineCount].contains("System") {
-				let sysHelper = createSystem(&strings,&lineCount);
-				if sysHelper.errorCount != 0 {
-					print!("{}",sysHelper.errorMsg);
-					errorCounter = 1;
-				}
-				println!("");
-				system.push(sysHelper.system);				
-				lineCount = sysHelper.count;
-			}else {
-				print!("Fehler in der Datei an der Zeile: ");
-				print!("{} ",&(lineCount+1).to_string());
-				println!("{} ",&strings[lineCount].to_string());
-				errorCounter = 1;
-			}
-		}
-		lineCount = lineCount + 1;
-    }
-
-	if errorCounter == 0 {	
-		if diagramTyp == "Klassendiagramm" {
-			draw::drawClassDiagram(args[2].to_string(),&objList,&relaList);
-		}else if diagramTyp == "Usecasediagramm"{
-			draw::drawUseCaseDiagram(args[2].to_string(),&akteur,&system);
-		}
-	}
-
-	
 }
