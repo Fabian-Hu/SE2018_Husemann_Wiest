@@ -35,10 +35,17 @@ pub fn build_ui(application: &gtk::Application) {
 
     let window: gtk::ApplicationWindow = builder.get_object("window").expect("Couldn't get window");
     window.set_application(application);
+    window.set_title("Parser");
     let open_button: gtk::ToolButton = builder.get_object("open_button")
                                               .expect("Couldn't get builder");
     let text_view: gtk::TextView = builder.get_object("text_view")
                                           .expect("Couldn't get text_view");
+    let parse_button: gtk::Button = builder.get_object("parseButton")
+                                              .expect("Couldn't get builder");
+    let parsedImage: gtk::Image = builder.get_object("parsedImage")
+                                              .expect("Couldn't get builder");
+
+    //parsedImage = gtk_image_new_from_file ("test.png");
 
     let window_weak = window.downgrade();
     open_button.connect_clicked(move |_| {
