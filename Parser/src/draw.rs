@@ -23,11 +23,103 @@ use self::rusttype::FontCollection;
 use self::rusttype::Scale;
 
 //https://www.frustfrei-lernen.de/mathematik/lineare-funktion-zwei-punkte.html
+pub fn draw_dashed_line_with(image: &mut RgbImage, lokalXFrom: f32, lokalXTo: f32, lokalYFrom: f32, lokalYTo: f32) {
+	let black = Rgb([0u8, 0u8, 0u8]);
+	let distance = 5.0; 
+	let dirVec = vec![(lokalXTo-lokalXFrom),(lokalYTo-lokalYFrom)];
+	let vecLenght = ((dirVec[0]*dirVec[0]+dirVec[1]*dirVec[1])).sqrt();
+	let unitVec = vec![(dirVec[0] * (distance/vecLenght)),(dirVec[1] * (distance/vecLenght))];
+	
+	let unitVecLeft = vec![(((dirVec[1]*-1.0)) * (distance/vecLenght*1.5)),((dirVec[0]) * (distance/vecLenght*1.5))];		
+	let unitVecRight = vec![(((dirVec[1])) * (distance/vecLenght*1.5)),(((dirVec[0]*-1.0)) * (distance/vecLenght*1.5))];
+	let mut newVecLeft = vec![];
+	let mut newVecRight = vec![];
+
+	let diffX = lokalXTo - lokalXFrom;
+	let diffY = lokalYTo - lokalYFrom;
+	let hypotenuse = ((diffX*diffX+diffY*diffY)).sqrt();
+	let len = hypotenuse / distance;
+	let mut altVec = vec![lokalXFrom,lokalYFrom];
+	for x in 0..len as i32{		
+		let newVec = vec![((altVec[0]) + unitVec[0]),((altVec[1]) + unitVec[1])];
+		if x % 2 > 0 {			
+			draw_line_segment_mut(&mut *image, (newVec[0] as f32, newVec[1] as f32), (altVec[0] as f32, altVec[1] as f32), black);
+		}
+		altVec = newVec;
+		if x == 3 {
+			
+			newVecLeft = vec![(altVec[0] + unitVecLeft[0]),(altVec[1] + unitVecLeft[1])];
+			newVecRight = vec![(altVec[0] + unitVecRight[0]),(altVec[1] + unitVecRight[1])];
+
+			draw_line_segment_mut(&mut *image, (newVecLeft[0] as f32, newVecLeft[1] as f32), (altVec[0] as f32, altVec[1] as f32), black);
+			draw_line_segment_mut(&mut *image, (newVecRight[0] as f32, newVecRight[1] as f32), (altVec[0] as f32, altVec[1] as f32), black);
+		}
+	}
+
+	draw_line_segment_mut(&mut *image, (newVecLeft[0] as f32, newVecLeft[1] as f32), (lokalXFrom as f32, lokalYFrom as f32), black);
+	draw_line_segment_mut(&mut *image, (newVecRight[0] as f32, newVecRight[1] as f32), (lokalXFrom as f32, lokalYFrom as f32), black);	
+}
+
+pub fn draw_dashed_line(image: &mut RgbImage, lokalXFrom: f32, lokalXTo: f32, lokalYFrom: f32, lokalYTo: f32) {
+	let black = Rgb([0u8, 0u8, 0u8]);
+	let distance = 5.0; 
+	let dirVec = vec![(lokalXTo-lokalXFrom),(lokalYTo-lokalYFrom)];
+	let vecLenght = ((dirVec[0]*dirVec[0]+dirVec[1]*dirVec[1])).sqrt();
+	let unitVec = vec![(dirVec[0] * (distance/vecLenght)),(dirVec[1] * (distance/vecLenght))];	
+
+	let diffX = lokalXTo - lokalXFrom;
+	let diffY = lokalYTo - lokalYFrom;
+	let hypotenuse = ((diffX*diffX+diffY*diffY)).sqrt();
+	let len = hypotenuse / distance;
+	let mut altVec = vec![lokalXFrom,lokalYFrom];
+	for x in 0..len as i32{		
+		let newVec = vec![((altVec[0]) + unitVec[0]),((altVec[1]) + unitVec[1])];
+		if x % 2 > 0 {			
+			draw_line_segment_mut(&mut *image, (newVec[0] as f32, newVec[1] as f32), (altVec[0] as f32, altVec[1] as f32), black);
+		}
+		altVec = newVec;	
+	}
+}
+
+pub fn draw_line_with(image: &mut RgbImage, lokalXFrom: f32, lokalXTo: f32, lokalYFrom: f32, lokalYTo: f32) {		
+	let black = Rgb([0u8, 0u8, 0u8]);	
+	draw_line_segment_mut(&mut *image, (lokalXFrom, lokalYFrom), (lokalXTo, lokalYTo), black);
+	let distance = 5.0; 
+	let dirVec = vec![(lokalXTo-lokalXFrom),(lokalYTo-lokalYFrom)];
+	let vecLenght = ((dirVec[0]*dirVec[0]+dirVec[1]*dirVec[1])).sqrt();
+	let unitVec = vec![(dirVec[0] * (distance/vecLenght)),(dirVec[1] * (distance/vecLenght))];
+	
+	let unitVecLeft = vec![(((dirVec[1]*-1.0)) * (distance/vecLenght*1.5)),((dirVec[0]) * (distance/vecLenght*1.5))];		
+	let unitVecRight = vec![(((dirVec[1])) * (distance/vecLenght*1.5)),(((dirVec[0]*-1.0)) * (distance/vecLenght*1.5))];
+	let mut newVecLeft = vec![];
+	let mut newVecRight = vec![];
+
+	let diffX = lokalXTo - lokalXFrom;
+	let diffY = lokalYTo - lokalYFrom;
+	let hypotenuse = ((diffX*diffX+diffY*diffY)).sqrt();
+	let len = hypotenuse / distance;
+	let mut altVec = vec![lokalXFrom,lokalYFrom];
+	for x in 0..len as i32{		
+		let newVec = vec![((altVec[0]) + unitVec[0]),((altVec[1]) + unitVec[1])];
+		altVec = newVec;
+		if x == 3 {			
+			newVecLeft = vec![(altVec[0] + unitVecLeft[0]),(altVec[1] + unitVecLeft[1])];
+			newVecRight = vec![(altVec[0] + unitVecRight[0]),(altVec[1] + unitVecRight[1])];
+
+			draw_line_segment_mut(&mut *image, (newVecLeft[0] as f32, newVecLeft[1] as f32), (altVec[0] as f32, altVec[1] as f32), black);
+			draw_line_segment_mut(&mut *image, (newVecRight[0] as f32, newVecRight[1] as f32), (altVec[0] as f32, altVec[1] as f32), black);
+		}
+	}
+
+	draw_line_segment_mut(&mut *image, (newVecLeft[0] as f32, newVecLeft[1] as f32), (lokalXFrom as f32, lokalYFrom as f32), black);
+	draw_line_segment_mut(&mut *image, (newVecRight[0] as f32, newVecRight[1] as f32), (lokalXFrom as f32, lokalYFrom as f32), black);	
+}
+
 
 pub fn drawClassDiagram(path: String, objList: &Vec<lib::Object>, relaList: &Vec<lib::RelationObject>) {
 	let path = Path::new(&path);
     let white = Rgb([255u8, 255u8, 255u8]);
-	 let red = Rgb([255u8, 0u8, 0u8]);
+	let red = Rgb([255u8, 0u8, 0u8]);
 	let black = Rgb([0u8, 0u8, 0u8]);
 
 	let font = Vec::from(include_bytes!("DejaVuSans.ttf") as &[u8]);
@@ -35,10 +127,10 @@ pub fn drawClassDiagram(path: String, objList: &Vec<lib::Object>, relaList: &Vec
 	let fontHeight = 16.2;
 	let scale = Scale { x: fontHeight * 1.3, y: fontHeight };
 
-	let mut x:i32 = 60;
-	let mut y:i32 = 10;
-	let lineHeight:i32 = 22;
-	let charLenght:i32 = 14;
+	let mut x:f32 = 60.0;
+	let mut y:f32 = 10.0;
+	let lineHeight:f32 = 22.0;
+	let charLenght:f32 = 14.0;
     let mut xCordinate = HashMap::new();	
     let mut yCordinate = HashMap::new();
 
@@ -47,14 +139,14 @@ pub fn drawClassDiagram(path: String, objList: &Vec<lib::Object>, relaList: &Vec
 	draw_filled_rect_mut(&mut image, Rect::at(0, 0).of_size(800, 800), white);
 	for obj in objList.iter() {
 		 // Draw a hollow rect within bounds
-		let mut length:i32 = x;
-		let mut height:i32 = y;
+		let mut length:f32 = x;
+		let mut height:f32 = y;
 		let mut yCordinateFunction;
     	
 		// TEXT für Objectname	
-		draw_text_mut(&mut image, black, (x+lineHeight/4) as u32, (y+lineHeight/6) as u32, scale, &font, &obj.name.to_string());
+		draw_text_mut(&mut image, black, (x+lineHeight/4.0) as u32, (y+lineHeight/6.0) as u32, scale, &font, &obj.name.to_string());
 
-		height +=4;
+		height +=4.0;
 		for attr in obj.attributes.iter(){
 			height += lineHeight;
 			let mut attrString = String::new();
@@ -65,16 +157,16 @@ pub fn drawClassDiagram(path: String, objList: &Vec<lib::Object>, relaList: &Vec
 				attrString.push_str(" = ");
 				attrString.push_str(&attr.value.to_string());
 			}
-			if attrString.len() as i32 * charLenght > length as i32 {
+			if attrString.len() as f32 * charLenght > length as f32 {
 				
-				length = attrString.len() as i32 * charLenght;
+				length = attrString.len() as f32 * charLenght;
 			}
 			//Komplettes Attribute printen;
-			draw_text_mut(&mut image, black, (x+lineHeight/4) as u32, (height+lineHeight/6) as u32, scale, &font, &attrString.to_string());
+			draw_text_mut(&mut image, black, (x+lineHeight/4.0) as u32, (height+lineHeight/6.0) as u32, scale, &font, &attrString.to_string());
 		}
  
 		yCordinateFunction = height + lineHeight;
-		height += 4;
+		height += 4.0;
 		
    	 	for func in obj.functions.iter(){
 			height += lineHeight;
@@ -89,32 +181,32 @@ pub fn drawClassDiagram(path: String, objList: &Vec<lib::Object>, relaList: &Vec
 				funcString.push_str(": ");
 				funcString.push_str(&func.returnValue.to_string());
 			}
-			if funcString.len() as i32 * charLenght > length as i32 {
+			if funcString.len() as f32 * charLenght > length as f32 {
 				
-				length = funcString.len() as i32 * charLenght;
+				length = funcString.len() as f32 * charLenght;
 			}
 			//Komplettes Attribute printen;
-			draw_text_mut(&mut image, black, (x+lineHeight/4) as u32, (height+lineHeight/6) as u32, scale, &font, &funcString.to_string());
+			draw_text_mut(&mut image, black, (x+lineHeight/4.0) as u32, (height+lineHeight/6.0) as u32, scale, &font, &funcString.to_string());
 		} 
 		// Box
-		draw_hollow_rect_mut(&mut image, Rect::at(x, y).of_size((length-x) as u32, (height-y+lineHeight) as u32), black);
+		draw_hollow_rect_mut(&mut image, Rect::at(x as i32,y as i32).of_size((length-x) as u32, (height-y+lineHeight) as u32), black);
 		//Line zwischen Name und Attribut
-		draw_line_segment_mut(&mut image, (x as f32, (y+lineHeight) as f32), ((length-1) as f32, (y+lineHeight) as f32), black);
+		draw_line_segment_mut(&mut image, (x, y+lineHeight), (length-1.0 , (y+lineHeight)), black);
 		// Line zwischen Attribut und Funktion
-		draw_line_segment_mut(&mut image, (x as f32, yCordinateFunction as f32), ((length-1) as f32, yCordinateFunction as f32), black);
+		draw_line_segment_mut(&mut image, (x, yCordinateFunction as f32), (length-1.0, yCordinateFunction as f32), black);
 		
 
-		xCordinate.insert(obj.name.to_string(),(x/2+length)/2);
-		yCordinate.insert(obj.name.to_string(),(height-y+lineHeight)/2+y);
+		xCordinate.insert(obj.name.to_string(),(x/2.0+length)/2.0);
+		yCordinate.insert(obj.name.to_string(),(height-y+lineHeight)/2.0+y);
 		
-		y = height+lineHeight+20;
+		y = height+lineHeight+20.0;
 	}
 	
 	for rela in relaList.iter() {
-		let mut lokalXTo = 0;
-		let mut lokalYTo = 0;
-		let mut lokalXFrom = 0;
-		let mut lokalYFrom = 0;
+		let mut lokalXTo = 0.0;
+		let mut lokalYTo = 0.0;
+		let mut lokalXFrom = 0.0;
+		let mut lokalYFrom = 0.0;
 		match xCordinate.get(&rela.to) {
         	Some(&cordinate) => lokalXTo = cordinate,
         	_ => println!(),
@@ -132,28 +224,18 @@ pub fn drawClassDiagram(path: String, objList: &Vec<lib::Object>, relaList: &Vec
         	_ => println!(),
     	}
 
-		//draw_line_segment_mut(&mut image, (lokalXTo as f32, lokalYTo as f32), (lokalXFrom as f32, lokalYFrom as f32), black);
-		// pub fn drawDashedLine(image , (lokalXTo , lokalYTo), (lokalXFrom, lokalYFrom), distance)
-		let distance = 5.0; 
-		let dirVec = vec![(lokalXTo-lokalXFrom),(lokalYTo-lokalYFrom),0];
-		let vecLenght = ((dirVec[0]*dirVec[0]+dirVec[1]*dirVec[1])as f64).sqrt();
-		let unitVec = vec![((dirVec[0] as f64) * (distance/vecLenght)),((dirVec[1] as f64) * (distance/vecLenght))];
-		let diffX = lokalXTo - lokalXFrom;
-		let diffY = lokalYTo - lokalYFrom;
-		let hypotenuse = ((diffX*diffX+diffY*diffY) as f64).sqrt();
-		let len = hypotenuse / distance;
-		println!("{}",hypotenuse);
-		let mut altVec = vec![lokalXFrom as f64,lokalYFrom as f64];
-		for x in 0..len as i32{		
-			let newVec = vec![((altVec[0] as f64) + unitVec[0]),((altVec[1] as f64) + unitVec[1])];
-			if x % 2 > 0 {			
-				draw_line_segment_mut(&mut image, (newVec[0] as f32, newVec[1] as f32), (altVec[0] as f32, altVec[1] as f32), black);
-			}
-			altVec = newVec;
-		}
-		//draw_line_segment_mut(&mut image, (lokalXTo as f32, lokalYTo as f32), (lokalXFrom as f32, lokalYFrom as f32), black);
+		println!("{}",rela.typ);
 		
-		// Gestrichelte LineCode Ende
+		if rela.typ.contains("Vererbung"){
+			draw_line_with(&mut image,lokalXFrom, lokalXTo, lokalYFrom ,lokalYTo);
+		}else if rela.typ.contains("Strichel"){
+			draw_dashed_line_with(&mut image,lokalXFrom, lokalXTo, lokalYFrom ,lokalYTo);
+		}else if rela.typ.contains("StrichelVererbung"){
+			draw_dashed_line(&mut image,lokalXFrom, lokalXTo, lokalYFrom ,lokalYTo);
+		}else if rela.typ.contains("Kennt"){
+			draw_line_segment_mut(&mut image, (lokalXFrom, lokalYFrom), (lokalXTo, lokalYTo), black);
+		}		
+		
 	}
 
 	image.save(path).unwrap();
