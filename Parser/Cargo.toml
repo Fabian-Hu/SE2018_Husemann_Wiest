@@ -40,3 +40,5 @@ futures-stable = ["futures-preview", "glib/futures", "gio/futures"]
 
 [[bin]]
 name = "text_viewer"
+[[bin]]
+name = "main"
