@@ -23,6 +23,44 @@ use self::rusttype::FontCollection;
 use self::rusttype::Scale;
 
 //https://www.frustfrei-lernen.de/mathematik/lineare-funktion-zwei-punkte.html
+pub fn draw_dashed_line_with_filled(image: &mut RgbImage, lokalXFrom: f32, lokalXTo: f32, lokalYFrom: f32, lokalYTo: f32) {
+	let black = Rgb([0u8, 0u8, 0u8]);
+	let distance = 5.0; 
+	let dirVec = vec![(lokalXTo-lokalXFrom),(lokalYTo-lokalYFrom)];
+	let vecLenght = ((dirVec[0]*dirVec[0]+dirVec[1]*dirVec[1])).sqrt();
+	let unitVec = vec![(dirVec[0] * (distance/vecLenght)),(dirVec[1] * (distance/vecLenght))];
+	
+	let unitVecLeft = vec![(((dirVec[1]*-1.0)) * (distance/vecLenght*1.5)),((dirVec[0]) * (distance/vecLenght*1.5))];		
+	let unitVecRight = vec![(((dirVec[1])) * (distance/vecLenght*1.5)),(((dirVec[0]*-1.0)) * (distance/vecLenght*1.5))];
+	let mut newVecLeft = vec![];
+	let mut newVecRight = vec![];
+
+	let diffX = lokalXTo - lokalXFrom;
+	let diffY = lokalYTo - lokalYFrom;
+	let hypotenuse = ((diffX*diffX+diffY*diffY)).sqrt();
+	let len = hypotenuse / distance;
+	let mut altVec = vec![lokalXFrom,lokalYFrom];
+	for x in 0..len as i32{		
+		let newVec = vec![((altVec[0]) + unitVec[0]),((altVec[1]) + unitVec[1])];
+		if x % 2 > 0 {			
+			draw_line_segment_mut(&mut *image, (newVec[0] as f32, newVec[1] as f32), (altVec[0] as f32, altVec[1] as f32), black);
+		}
+		altVec = newVec;
+		if x == 3 {
+			
+			newVecLeft = vec![(altVec[0] + unitVecLeft[0]),(altVec[1] + unitVecLeft[1])];
+			newVecRight = vec![(altVec[0] + unitVecRight[0]),(altVec[1] + unitVecRight[1])];
+
+			draw_line_segment_mut(&mut *image, (newVecLeft[0] as f32, newVecLeft[1] as f32), (altVec[0] as f32, altVec[1] as f32), black);
+			draw_line_segment_mut(&mut *image, (newVecRight[0] as f32, newVecRight[1] as f32), (altVec[0] as f32, altVec[1] as f32), black);
+		}
+	}
+
+	draw_line_segment_mut(&mut *image, (newVecLeft[0] as f32, newVecLeft[1] as f32), (lokalXFrom as f32, lokalYFrom as f32), black);
+	draw_line_segment_mut(&mut *image, (newVecRight[0] as f32, newVecRight[1] as f32), (lokalXFrom as f32, lokalYFrom as f32), black);	
+}
+
+
 pub fn draw_dashed_line_with(image: &mut RgbImage, lokalXFrom: f32, lokalXTo: f32, lokalYFrom: f32, lokalYTo: f32) {
 	let black = Rgb([0u8, 0u8, 0u8]);
 	let distance = 5.0; 
