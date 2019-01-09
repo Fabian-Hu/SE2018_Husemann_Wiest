@@ -50,15 +50,33 @@ Object
 		Return: void
 	/Function
 /Object
+Object
+	Name: Vogel
+	Attribut
+		Name: Farbe
+		Typ: Color
+	/Attribut
+	Function
+		Name: bellen
+		Parameter: lautstärke: Integer
+		Return: void
+	/Function
+/Object
 Relation
 	Description: Ein Hund ist ein Tier
-	Typ: Vererbung
-	From: Tier
-	To: Hund
+	Typ: Aggregation
+	From: Katze
+	To: Vogel
 /Relation
 Relation
 	Description: Ein Hund ist ein Tier
 	Typ: Aggregation
 	From: Hund
 	To: Katze
+/Relation
+Relation
+	Description: Ein Hund ist ein Tier
+	Typ: Vererbung
+	From: Tier
+	To: Hund
 /Relation

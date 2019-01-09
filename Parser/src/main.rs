@@ -42,9 +42,11 @@ pub fn build_ui(application: &gtk::Application) {
                                           .expect("Couldn't get text_view");
     let parse_button: gtk::Button = builder.get_object("parseButton")
                                               .expect("Couldn't get builder");
-    let parsedImage: gtk::Image = builder.get_object("parsedImage")
+    let mut parsedImage: gtk::Image = builder.get_object("parsedImage")
                                               .expect("Couldn't get builder");
-    //parsedImage = gtk_image_new_from_file("test.png");
+    let imageParsed=gtk::Image::new_from_file("test.png");
+    
+    let mut textFromDatei= String::new();
 
     let window_weak = window.downgrade();
     open_button.connect_clicked(move |_| {
@@ -60,17 +62,19 @@ pub fn build_ui(application: &gtk::Application) {
         if file_chooser.run() == gtk::ResponseType::Ok.into() {
             let filename = file_chooser.get_filename().expect("Couldn't get filename");
             let file = File::open(&filename).expect("Couldn't open file");
-			let mut contents = String::new();
+	    let mut contents = String::new();
             let mut reader = BufReader::new(file);		 
             let _ = reader.read_to_string(&mut contents);
             text_view.get_buffer().expect("Couldn't get window").set_text(&contents);
-			parseString(&contents);
-		}
+	    parseString(&contents);
+	    
+	    //textFromDatei=contents;
 
+		}
         file_chooser.destroy();
     });
-
-
+    parsedImage=imageParsed;
+    //println!("{}", textFromDatei);
 
     window.connect_delete_event(|win, _| {
         win.destroy();
@@ -162,9 +166,14 @@ fn parseString(s: &String) {
 		}
 		lineCount = lineCount + 1;
     }
+	
 
 	if errorCounter == 0 {	
 		if diagramTyp == "Klassendiagramm" {
+			calculateWeighting(&mut objList,&relaList);	
+			for obj in objList.iter() {
+				println!("{} Gewicht: {}",obj.name,obj.weighting);
+			}		
 			draw::drawClassDiagram("Klassendiagramm.png".to_string(),&objList,&relaList);
 		}else if diagramTyp == "Usecasediagramm"{
 			draw::drawUseCaseDiagram("UseCaseDiagramm.png".to_string(),&akteur,&system);
@@ -173,6 +182,52 @@ fn parseString(s: &String) {
 
 	println!("Der Parser war Erfolgreich");
 }
+
+fn calculateWeighting(objList: &mut Vec<lib::Object>, relaList: &Vec<lib::RelationObject>) {	
+	for rela in relaList.iter() {
+		let mut tempFromIndex = 0;
+		let mut tempToIndex = 0;
+		for x in 0..objList.len(){	
+			if objList[x].name.to_string() == rela.from.to_string() {
+				tempFromIndex = x;
+			}
+
+			if objList[x].name.to_string() == rela.to.to_string() {
+				tempToIndex = x;
+			}
+		}
+
+		let mut tempName = objList[tempToIndex].name.clone();
+		objList[tempFromIndex].addChild(tempName);
+
+		if objList[tempFromIndex].weighting == 1 && objList[tempToIndex].weighting == 1 {
+			objList[tempFromIndex].setWeighting(10);
+			objList[tempToIndex].setWeighting(0);
+		}else if objList[tempFromIndex].weighting != 1 && objList[tempToIndex].weighting == 1 {
+			let mut tempValue = objList[tempFromIndex].weighting.clone();		
+			objList[tempToIndex].setWeighting(tempValue - 10);
+		}else if objList[tempFromIndex].weighting == 1 && objList[tempToIndex].weighting != 1 {
+			let mut tempValue = objList[tempToIndex].weighting.clone();
+			objList[tempFromIndex].setWeighting(tempValue+10);
+		}else if objList[tempFromIndex].weighting != 1 && objList[tempToIndex].weighting != 1 {
+			let mut tempFromW = objList[tempFromIndex].weighting.clone();
+			let mut tempToW = objList[tempToIndex].weighting.clone();
+			let mut tempDiff = tempFromW - tempToW - 10;		
+			objList[tempToIndex].addWeighting(tempDiff);
+		
+			let tempChildName = objList[tempToIndex].child.clone();
+			for childName in tempChildName.iter(){
+				for y in 0..objList.len(){	
+					if objList[y].name == *childName {
+						objList[y].addWeighting(tempDiff);
+					}
+				}
+			}
+		}
+	}		
+}
+
+
 fn createFunction(line: &Vec<&str>,lineCount: &usize) -> lib::FunctionHelper {
 	let mut lineCount2 = *lineCount;
 	let mut funcName = "";
@@ -490,11 +545,13 @@ fn createObject(line: &Vec<&str>,lineCount: &usize) -> lib::ObjectHelper {
  		funcErrorMsg.push_str(" Fehler: Das Objekt hat keinen Name: !");	
 		funcErrorCount = 1;
 	}
-
-	let obj = lib::Object{
+	let mut children : Vec<String> = vec![];
+	let mut obj = lib::Object{
 		name: objname.to_string(),
 		attributes: attrs,
 		functions: funcs,
+		weighting: 1,
+		child: children,
 	};
 
 	let objectHelp = lib::ObjectHelper{

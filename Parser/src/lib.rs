@@ -78,7 +78,28 @@ pub struct Function {
 pub struct Object {
 	pub name: String,
 	pub attributes: Vec<Attribut>, 
-	pub functions: Vec<Function>, 
+	pub functions: Vec<Function>,
+	pub weighting: i32,
+	pub child: Vec<String>,
+}
+
+impl Object {
+	pub fn addWeighting(&mut self, value: i32){
+		self.weighting += value;
+	}
+
+	pub fn subWeighting(&mut self, value: i32){
+		self.weighting -= value;
+	}
+
+	pub fn setWeighting(&mut self, value: i32){
+		self.weighting = value;
+	}
+
+	pub fn addChild(&mut self, child: String){
+		self.child.push(child);
+	}
+
 }
 
 pub struct System {
