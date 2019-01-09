@@ -170,7 +170,8 @@ fn parseString(s: &String) {
 
 	if errorCounter == 0 {	
 		if diagramTyp == "Klassendiagramm" {
-			calculateWeighting(&mut objList,&relaList);	
+			calculateWeighting(&mut objList,&relaList);
+			println!();	
 			for obj in objList.iter() {
 				println!("{} Gewicht: {}",obj.name,obj.weighting);
 			}		
@@ -215,18 +216,25 @@ fn calculateWeighting(objList: &mut Vec<lib::Object>, relaList: &Vec<lib::Relati
 			let mut tempDiff = tempFromW - tempToW - 10;		
 			objList[tempToIndex].addWeighting(tempDiff);
 		
-			let tempChildName = objList[tempToIndex].child.clone();
-			for childName in tempChildName.iter(){
-				for y in 0..objList.len(){	
-					if objList[y].name == *childName {
-						objList[y].addWeighting(tempDiff);
-					}
-				}
-			}
+			addAllWeight(objList,tempDiff,tempToIndex);
 		}
+
+		println!("{} Aktuelles Gewicht: {}",objList[tempFromIndex].name,objList[tempFromIndex].weighting);
+		println!("{} Aktuelles Gewicht: {}",objList[tempToIndex].name,objList[tempToIndex].weighting);
 	}		
 }
 
+fn addAllWeight(objList: &mut Vec<lib::Object>,value: i32,startIndex: usize){
+	let tempChildName = objList[startIndex].child.clone();
+	for childName in tempChildName.iter(){
+		for y in 0..objList.len(){	
+			if objList[y].name == *childName {
+				objList[y].addWeighting(value);
+				addAllWeight(objList,value,y);
+			}
+		}
+	}
+}
 
 fn createFunction(line: &Vec<&str>,lineCount: &usize) -> lib::FunctionHelper {
 	let mut lineCount2 = *lineCount;
