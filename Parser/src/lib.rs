@@ -3,6 +3,7 @@ pub enum RelaTyp {
 	Vererbung,
 	Kennt,
 	Abhaengigkeit,	
+	Aggregation,
 }
 
 pub struct Attribut {

@@ -23,7 +23,7 @@ use self::rusttype::FontCollection;
 use self::rusttype::Scale;
 
 //https://www.frustfrei-lernen.de/mathematik/lineare-funktion-zwei-punkte.html
-pub fn draw_dashed_line_with_filled(image: &mut RgbImage, lokalXFrom: f32, lokalXTo: f32, lokalYFrom: f32, lokalYTo: f32) {
+pub fn draw_line_with_aggregation(image: &mut RgbImage, lokalXFrom: f32, lokalXTo: f32, lokalYFrom: f32, lokalYTo: f32) {
 	let black = Rgb([0u8, 0u8, 0u8]);
 	let distance = 5.0; 
 	let dirVec = vec![(lokalXTo-lokalXFrom),(lokalYTo-lokalYFrom)];
@@ -34,6 +34,7 @@ pub fn draw_dashed_line_with_filled(image: &mut RgbImage, lokalXFrom: f32, lokal
 	let unitVecRight = vec![(((dirVec[1])) * (distance/vecLenght*1.5)),(((dirVec[0]*-1.0)) * (distance/vecLenght*1.5))];
 	let mut newVecLeft = vec![];
 	let mut newVecRight = vec![];
+	let mut tempVec = vec![];
 
 	let diffX = lokalXTo - lokalXFrom;
 	let diffY = lokalYTo - lokalYFrom;
@@ -42,22 +43,23 @@ pub fn draw_dashed_line_with_filled(image: &mut RgbImage, lokalXFrom: f32, lokal
 	let mut altVec = vec![lokalXFrom,lokalYFrom];
 	for x in 0..len as i32{		
 		let newVec = vec![((altVec[0]) + unitVec[0]),((altVec[1]) + unitVec[1])];
-		if x % 2 > 0 {			
-			draw_line_segment_mut(&mut *image, (newVec[0] as f32, newVec[1] as f32), (altVec[0] as f32, altVec[1] as f32), black);
+		if x == 5 {
+			tempVec = newVec.clone();
 		}
+
 		altVec = newVec;
-		if x == 3 {
-			
+		if x == 2 {			
 			newVecLeft = vec![(altVec[0] + unitVecLeft[0]),(altVec[1] + unitVecLeft[1])];
 			newVecRight = vec![(altVec[0] + unitVecRight[0]),(altVec[1] + unitVecRight[1])];
-
-			draw_line_segment_mut(&mut *image, (newVecLeft[0] as f32, newVecLeft[1] as f32), (altVec[0] as f32, altVec[1] as f32), black);
-			draw_line_segment_mut(&mut *image, (newVecRight[0] as f32, newVecRight[1] as f32), (altVec[0] as f32, altVec[1] as f32), black);
-		}
+		}		
 	}
+	draw_line_segment_mut(&mut *image, (tempVec[0] as f32, tempVec[1] as f32), (lokalXTo as f32, lokalYTo as f32), black);	
 
 	draw_line_segment_mut(&mut *image, (newVecLeft[0] as f32, newVecLeft[1] as f32), (lokalXFrom as f32, lokalYFrom as f32), black);
 	draw_line_segment_mut(&mut *image, (newVecRight[0] as f32, newVecRight[1] as f32), (lokalXFrom as f32, lokalYFrom as f32), black);	
+
+	draw_line_segment_mut(&mut *image, (newVecLeft[0] as f32, newVecLeft[1] as f32), (tempVec[0] as f32, tempVec[1] as f32), black);
+	draw_line_segment_mut(&mut *image, (newVecRight[0] as f32, newVecRight[1] as f32), (tempVec[0] as f32, tempVec[1] as f32), black);	
 }
 
 
@@ -120,8 +122,7 @@ pub fn draw_dashed_line(image: &mut RgbImage, lokalXFrom: f32, lokalXTo: f32, lo
 }
 
 pub fn draw_line_with(image: &mut RgbImage, lokalXFrom: f32, lokalXTo: f32, lokalYFrom: f32, lokalYTo: f32) {		
-	let black = Rgb([0u8, 0u8, 0u8]);	
-	draw_line_segment_mut(&mut *image, (lokalXFrom, lokalYFrom), (lokalXTo, lokalYTo), black);
+	let black = Rgb([0u8, 0u8, 0u8]);		
 	let distance = 5.0; 
 	let dirVec = vec![(lokalXTo-lokalXFrom),(lokalYTo-lokalYFrom)];
 	let vecLenght = ((dirVec[0]*dirVec[0]+dirVec[1]*dirVec[1])).sqrt();
@@ -131,6 +132,7 @@ pub fn draw_line_with(image: &mut RgbImage, lokalXFrom: f32, lokalXTo: f32, loka
 	let unitVecRight = vec![(((dirVec[1])) * (distance/vecLenght*1.5)),(((dirVec[0]*-1.0)) * (distance/vecLenght*1.5))];
 	let mut newVecLeft = vec![];
 	let mut newVecRight = vec![];
+	let mut tempVec = vec![];
 
 	let diffX = lokalXTo - lokalXFrom;
 	let diffY = lokalYTo - lokalYFrom;
@@ -140,7 +142,8 @@ pub fn draw_line_with(image: &mut RgbImage, lokalXFrom: f32, lokalXTo: f32, loka
 	for x in 0..len as i32{		
 		let newVec = vec![((altVec[0]) + unitVec[0]),((altVec[1]) + unitVec[1])];
 		altVec = newVec;
-		if x == 3 {			
+		if x == 3 {	
+			tempVec = altVec.clone();		
 			newVecLeft = vec![(altVec[0] + unitVecLeft[0]),(altVec[1] + unitVecLeft[1])];
 			newVecRight = vec![(altVec[0] + unitVecRight[0]),(altVec[1] + unitVecRight[1])];
 
@@ -148,15 +151,15 @@ pub fn draw_line_with(image: &mut RgbImage, lokalXFrom: f32, lokalXTo: f32, loka
 			draw_line_segment_mut(&mut *image, (newVecRight[0] as f32, newVecRight[1] as f32), (altVec[0] as f32, altVec[1] as f32), black);
 		}
 	}
-
 	draw_line_segment_mut(&mut *image, (newVecLeft[0] as f32, newVecLeft[1] as f32), (lokalXFrom as f32, lokalYFrom as f32), black);
 	draw_line_segment_mut(&mut *image, (newVecRight[0] as f32, newVecRight[1] as f32), (lokalXFrom as f32, lokalYFrom as f32), black);	
+	draw_line_segment_mut(&mut *image, (tempVec[0] as f32, tempVec[1] as f32), (lokalXTo, lokalYTo), black);
 }
 
 
 pub fn drawClassDiagram(path: String, objList: &Vec<lib::Object>, relaList: &Vec<lib::RelationObject>) {
 	let path = Path::new(&path);
-    let white = Rgb([255u8, 255u8, 255u8]);
+    	let white = Rgb([255u8, 255u8, 255u8]);
 	let red = Rgb([255u8, 0u8, 0u8]);
 	let black = Rgb([0u8, 0u8, 0u8]);
 
@@ -169,8 +172,8 @@ pub fn drawClassDiagram(path: String, objList: &Vec<lib::Object>, relaList: &Vec
 	let mut y:f32 = 10.0;
 	let lineHeight:f32 = 22.0;
 	let charLenght:f32 = 14.0;
-    let mut xCordinate = HashMap::new();	
-    let mut yCordinate = HashMap::new();
+    	let mut xCordinate = HashMap::new();	
+    	let mut yCordinate = HashMap::new();
 
 	let mut image = RgbImage::new(800, 800);
 	// Background
@@ -266,6 +269,7 @@ pub fn drawClassDiagram(path: String, objList: &Vec<lib::Object>, relaList: &Vec
 			lib::RelaTyp::Vererbung => draw_line_with(&mut image,lokalXFrom, lokalXTo, lokalYFrom ,lokalYTo),
 			lib::RelaTyp::Kennt => draw_line_segment_mut(&mut image, (lokalXFrom, lokalYFrom), (lokalXTo, lokalYTo), black),
 			lib::RelaTyp::Abhaengigkeit => draw_dashed_line_with(&mut image,lokalXFrom, lokalXTo, lokalYFrom ,lokalYTo),
+			lib::RelaTyp::Aggregation => draw_line_with_aggregation(&mut image,lokalXFrom, lokalXTo, lokalYFrom ,lokalYTo),
 			_ => println!("Es ist ein Fehler beim Zeichnen bei den Relationen"),
 		}		
 		

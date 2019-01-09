@@ -343,6 +343,8 @@ fn createRelation(line: &Vec<&str>,lineCount: &usize, objList: &Vec<lib::Object>
 		rela_typ = lib::RelaTyp::Kennt;
 	}else if relaTyp.contains("Abhängigkeit"){
 		rela_typ = lib::RelaTyp::Abhaengigkeit;
+	}else if relaTyp.contains("Aggregation"){
+		rela_typ = lib::RelaTyp::Aggregation;
 	}
 
 	let relationObject = lib::RelationObject {
