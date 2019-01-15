@@ -47,12 +47,12 @@ pub fn build_ui(application: &gtk::Application) {
     let imageParsed=gtk::Image::new_from_file("test.png");
     
     let mut textFromDatei= String::new();
+    let mut textFromDateiClone= textFromDatei.clone();
 
     let window_weak = window.downgrade();
+    let text_view_copy=text_view.clone();
     open_button.connect_clicked(move |_| {
         let window = upgrade_weak!(window_weak);
-
-        // TODO move this to a impl?
         let file_chooser = gtk::FileChooserDialog::new(
             Some("Open File"), Some(&window), gtk::FileChooserAction::Open);
         file_chooser.add_buttons(&[
@@ -62,25 +62,27 @@ pub fn build_ui(application: &gtk::Application) {
         if file_chooser.run() == gtk::ResponseType::Ok.into() {
             let filename = file_chooser.get_filename().expect("Couldn't get filename");
             let file = File::open(&filename).expect("Couldn't open file");
-	    let mut contents = String::new();
+            let mut contents = String::new();
             let mut reader = BufReader::new(file);		 
             let _ = reader.read_to_string(&mut contents);
             text_view.get_buffer().expect("Couldn't get window").set_text(&contents);
-	    parseString(&contents);
-	    
-	    //textFromDatei=contents;
-
-		}
+	    //parseString(&contents);
+	}
         file_chooser.destroy();
     });
+    let counter=0;
+    parse_button.connect_clicked(move |_| {
+    	let startiter=text_view_copy.get_buffer().expect("Couldn't get window").get_start_iter();
+    	let enditer=text_view_copy.get_buffer().expect("Couldn't get window").get_end_iter();
+    	let textTest=text_view_copy.get_buffer().expect("Couldn't get window").get_text(&startiter, &enditer, false);
+    	//println!("{:#?}", textTest.unwrap());
+        parseString(&textTest.unwrap());
+    });
     parsedImage=imageParsed;
-    //println!("{}", textFromDatei);
-
     window.connect_delete_event(|win, _| {
         win.destroy();
         Inhibit(false)
     });
-
     window.show_all();
 }
 
