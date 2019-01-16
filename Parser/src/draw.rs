@@ -156,124 +156,154 @@ pub fn draw_line_with(image: &mut RgbImage, lokalXFrom: f32, lokalXTo: f32, loka
 	draw_line_segment_mut(&mut *image, (tempVec[0] as f32, tempVec[1] as f32), (lokalXTo, lokalYTo), black);
 }
 
-
-pub fn drawClassDiagram(path: String, objList: &Vec<lib::Object>, relaList: &Vec<lib::RelationObject>) {
-	let path = Path::new(&path);
-    	let white = Rgb([255u8, 255u8, 255u8]);
-	let red = Rgb([255u8, 0u8, 0u8]);
+pub fn drawObject(image: &mut RgbImage,x: f32, y:f32,obj: &lib::Object) -> lib::drawHelper{
+	let lineHeight:f32 = 22.0;
+	let charLenght:f32 = 11.0;
 	let black = Rgb([0u8, 0u8, 0u8]);
-
 	let font = Vec::from(include_bytes!("DejaVuSans.ttf") as &[u8]);
 	let font = FontCollection::from_bytes(font).unwrap().into_font().unwrap();
 	let fontHeight = 16.2;
 	let scale = Scale { x: fontHeight * 1.3, y: fontHeight };
+	let mut lenght:f32 = x;
+	let mut height:f32 = y;
+	let mut yCordinateFunction;
 
-	let mut x:f32 = 60.0;
-	let mut y:f32 = 10.0;
-	let lineHeight:f32 = 22.0;
-	let charLenght:f32 = 14.0;
-    	let mut xCordinate = HashMap::new();	
-    	let mut yCordinate = HashMap::new();
+	draw_text_mut(&mut *image, black, (x+lineHeight/4.0) as u32, (y+lineHeight/6.0) as u32, scale, &font, &obj.name.to_string());
 
-	let mut image = RgbImage::new(800, 800);
-	// Background
-	draw_filled_rect_mut(&mut image, Rect::at(0, 0).of_size(800, 800), white);
-	for obj in objList.iter() {
-		 // Draw a hollow rect within bounds
-		let mut length:f32 = x;
-		let mut height:f32 = y;
-		let mut yCordinateFunction;
-    	
-		// TEXT für Objectname	
-		draw_text_mut(&mut image, black, (x+lineHeight/4.0) as u32, (y+lineHeight/6.0) as u32, scale, &font, &obj.name.to_string());
-
-		height +=4.0;
-		for attr in obj.attributes.iter(){
-			height += lineHeight;
-			let mut attrString = String::new();
-			attrString.push_str(&attr.name.to_string());
-			attrString.push_str(": ");
-			attrString.push_str(&attr.typ.to_string());
-			if attr.value != ""{
-				attrString.push_str(" = ");
-				attrString.push_str(&attr.value.to_string());
-			}
-			if attrString.len() as f32 * charLenght > length as f32 {
-				
-				length = attrString.len() as f32 * charLenght;
-			}
-			//Komplettes Attribute printen;
-			draw_text_mut(&mut image, black, (x+lineHeight/4.0) as u32, (height+lineHeight/6.0) as u32, scale, &font, &attrString.to_string());
+	height +=4.0;
+	for attr in obj.attributes.iter(){
+		height += lineHeight;
+		let mut attrString = String::new();
+		attrString.push_str(&attr.name.to_string());
+		attrString.push_str(": ");
+		attrString.push_str(&attr.typ.to_string());
+		if attr.value != ""{
+			attrString.push_str(" = ");
+			attrString.push_str(&attr.value.to_string());
 		}
- 
-		yCordinateFunction = height + lineHeight;
-		height += 4.0;
-		
-   	 	for func in obj.functions.iter(){
-			height += lineHeight;
-			let mut funcString = String::new();
-			funcString.push_str(&func.name.to_string());
-			funcString.push_str("(");
-			if func.parameter != "" {
-				funcString.push_str(&func.parameter.to_string());
-			}	
-			funcString.push_str(")");
-			if func.returnValue != ""{
-				funcString.push_str(": ");
-				funcString.push_str(&func.returnValue.to_string());
-			}
-			if funcString.len() as f32 * charLenght > length as f32 {
-				
-				length = funcString.len() as f32 * charLenght;
-			}
-			//Komplettes Attribute printen;
-			draw_text_mut(&mut image, black, (x+lineHeight/4.0) as u32, (height+lineHeight/6.0) as u32, scale, &font, &funcString.to_string());
-		} 
-		// Box
-		draw_hollow_rect_mut(&mut image, Rect::at(x as i32,y as i32).of_size((length-x) as u32, (height-y+lineHeight) as u32), black);
-		//Line zwischen Name und Attribut
-		draw_line_segment_mut(&mut image, (x, y+lineHeight), (length-1.0 , (y+lineHeight)), black);
-		// Line zwischen Attribut und Funktion
-		draw_line_segment_mut(&mut image, (x, yCordinateFunction as f32), (length-1.0, yCordinateFunction as f32), black);
-		
-
-		xCordinate.insert(obj.name.to_string(),(x/2.0+length)/2.0);
-		yCordinate.insert(obj.name.to_string(),(height-y+lineHeight)/2.0+y);
-		
-		y = height+lineHeight+20.0;
+		if attrString.len() as f32 * charLenght > lenght as f32 {
+			
+			lenght = attrString.len() as f32 * charLenght;
+		}
+		//Komplettes Attribute printen;
+		draw_text_mut(&mut *image, black, (x+lineHeight/4.0) as u32, (height+lineHeight/6.0) as u32, scale, &font, &attrString.to_string());
 	}
-	
-	for rela in relaList.iter() {
-		let mut lokalXTo = 0.0;
-		let mut lokalYTo = 0.0;
-		let mut lokalXFrom = 0.0;
-		let mut lokalYFrom = 0.0;
-		match xCordinate.get(&rela.to) {
-        	Some(&cordinate) => lokalXTo = cordinate,
-        	_ => println!(),
-    	}
-		match yCordinate.get(&rela.to) {
-        	Some(&cordinate) => lokalYTo = cordinate,
-        	_ => println!(),
-    	}
-		match xCordinate.get(&rela.from) {
-        	Some(&cordinate) => lokalXFrom = cordinate,
-        	_ => println!(),
-    	}
-		match yCordinate.get(&rela.from) {
-        	Some(&cordinate) => lokalYFrom = cordinate,
-        	_ => println!(),
-    	}
 
+	yCordinateFunction = height + lineHeight;
+	height += 4.0;
+	
+ 	for func in obj.functions.iter(){
+		height += lineHeight;
+		let mut funcString = String::new();
+		funcString.push_str(&func.name.to_string());
+		funcString.push_str("(");
+		if func.parameter != "" {
+			funcString.push_str(&func.parameter.to_string());
+		}	
+		funcString.push_str(")");
+		if func.returnValue != ""{
+			funcString.push_str(": ");
+			funcString.push_str(&func.returnValue.to_string());
+		}
+		if funcString.len() as f32 * charLenght > lenght as f32 {
+			
+			lenght = funcString.len() as f32 * charLenght;
+		}
+		//Komplettes Attribute printen;
+		draw_text_mut(&mut *image, black, (x+lineHeight/4.0) as u32, (height+lineHeight/6.0) as u32, scale, &font, &funcString.to_string());
+	} 
+	// Box
+	draw_hollow_rect_mut(&mut *image, Rect::at(x as i32,y as i32).of_size((lenght) as u32, (height-y+lineHeight) as u32), black);
+	//Line zwischen Name und Attribut
+	draw_line_segment_mut(&mut *image, (x, y+lineHeight), (x+lenght-1.0 , (y+lineHeight)), black);
+	// Line zwischen Attribut und Funktion
+	draw_line_segment_mut(&mut *image, (x, yCordinateFunction as f32), (x+lenght-1.0, yCordinateFunction as f32), black);		
+
+	let drawHelper = lib::drawHelper {
+	 	height: (height-y+lineHeight),
+		lenght:	lenght,		
+	};
+
+	return drawHelper;
+}
+
+pub fn drawClassDiagram(path: String, objList: &mut Vec<lib::Object>, relaList: &Vec<lib::RelationObject>) {
+	let path = Path::new(&path);
+    let white = Rgb([255u8, 255u8, 255u8]);
+	let red = Rgb([255u8, 0u8, 0u8]);
+	let black = Rgb([0u8, 0u8, 0u8]);
+	
+	let mut x:f32 = 40.0;
+	let mut y:f32 = 10.0;
+	
+	let mut image = RgbImage::new(1600, 1600);
+	// Background
+	draw_filled_rect_mut(&mut image, Rect::at(0, 0).of_size(1600, 1600), white);
+
+	objList.sort_by(|a,b| b.weighting.cmp(&a.weighting));
+	
+	let mut Cordinates = HashMap::new();
+	
+	println!();
+	println!("Sorting...");
+
+	for i in 0..objList.len(){	
+		println!("{} Gewicht: {}",objList[i].name,objList[i].weighting);
+		let helper = drawObject(&mut image,x,y,&objList[i]);
+
+		let middle = (x as i32) +((helper.lenght as i32)/2);
+
+		let mut objectJoins = lib::objectJoins{
+			upperJoinX: middle as f32,
+	 		upperJoinY: y,
+	 		lowerJoinX: middle as f32,
+	 		lowerJoinY: (y+helper.height),
+		};
+
+		Cordinates.insert(objList[i].name.to_string(),objectJoins);
+
+		if i != objList.len()-1 {
+			println!("next: {} temp: {}",objList[i+1].weighting,objList[i].weighting);
+			if objList[i+1].weighting == objList[i].weighting{
+				x = x + helper.lenght + 10.0;
+			}else if objList[i+1].weighting < objList[i].weighting{
+				x = 40.0;
+				y = y + helper.height + 60.0;
+			}
+		}
+	}
+
+	
+	/*for rela in relaList.iter() {
+		println!("Relas");
+		let mut errorJoin = lib::objectJoins{
+			upperJoinX: 0.0,
+	 		upperJoinY: 0.0,
+	 		lowerJoinX: 0.0,
+	 		lowerJoinY: 0.0,
+		};
+
+		let mut fromJoin = &errorJoin;
+		let mut toJoin = &errorJoin;
+
+		match Cordinates.get(&rela.to) {
+        	Some(join) => toJoin = &join,
+        	_ => println!(),
+    	}
+		match Cordinates.get(&rela.from) {
+        	Some(join) => fromJoin = &join,
+        	_ => println!(),
+    	}
+		println!("{}",fromJoin.lowerJoinX);
 		match rela.typ{
-			lib::RelaTyp::Vererbung => draw_line_with(&mut image,lokalXFrom, lokalXTo, lokalYFrom ,lokalYTo),
-			lib::RelaTyp::Kennt => draw_line_segment_mut(&mut image, (lokalXFrom, lokalYFrom), (lokalXTo, lokalYTo), black),
-			lib::RelaTyp::Abhaengigkeit => draw_dashed_line_with(&mut image,lokalXFrom, lokalXTo, lokalYFrom ,lokalYTo),
-			lib::RelaTyp::Aggregation => draw_line_with_aggregation(&mut image,lokalXFrom, lokalXTo, lokalYFrom ,lokalYTo),
+			lib::RelaTyp::Vererbung => draw_line_with(&mut image,fromJoin.lowerJoinX, toJoin.upperJoinX, fromJoin.lowerJoinY ,toJoin.upperJoinY),
+			lib::RelaTyp::Kennt => draw_line_segment_mut(&mut image, (fromJoin.lowerJoinX, fromJoin.lowerJoinY), (toJoin.upperJoinX, toJoin.upperJoinY), black),
+			lib::RelaTyp::Abhaengigkeit => draw_dashed_line_with(&mut image,fromJoin.lowerJoinX, toJoin.upperJoinX, fromJoin.lowerJoinY ,toJoin.upperJoinY),
+			lib::RelaTyp::Aggregation => draw_line_with_aggregation(&mut image,fromJoin.lowerJoinX, toJoin.upperJoinX, fromJoin.lowerJoinY ,toJoin.upperJoinY),
 			_ => println!("Es ist ein Fehler beim Zeichnen bei den Relationen"),
 		}		
 		
-	}
+	}*/
 
 	image.save(path).unwrap();
 }

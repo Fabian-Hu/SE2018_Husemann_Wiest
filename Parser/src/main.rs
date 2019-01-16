@@ -177,7 +177,7 @@ fn parseString(s: &String) {
 			for obj in objList.iter() {
 				println!("{} Gewicht: {}",obj.name,obj.weighting);
 			}		
-			draw::drawClassDiagram("Klassendiagramm.png".to_string(),&objList,&relaList);
+			draw::drawClassDiagram("Klassendiagramm.png".to_string(),&mut objList,&relaList);
 		}else if diagramTyp == "Usecasediagramm"{
 			draw::drawUseCaseDiagram("UseCaseDiagramm.png".to_string(),&akteur,&system);
 		}

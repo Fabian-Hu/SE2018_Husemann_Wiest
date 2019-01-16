@@ -75,6 +75,18 @@ pub struct Function {
 	pub returnValue: String, 
 }
 
+pub struct drawHelper{
+	pub height: f32,
+	pub lenght: f32,
+}
+
+pub struct objectJoins{
+	pub upperJoinX: f32,
+	pub upperJoinY: f32,
+	pub lowerJoinX: f32,
+	pub lowerJoinY: f32,
+}
+
 pub struct Object {
 	pub name: String,
 	pub attributes: Vec<Attribut>, 
