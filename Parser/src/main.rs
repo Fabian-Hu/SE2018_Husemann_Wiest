@@ -45,10 +45,8 @@ pub fn build_ui(application: &gtk::Application) {
                                               .expect("Couldn't get builder");
     let mut parsedImage: gtk::Image = builder.get_object("parsedImage")
                                               .expect("Couldn't get builder");
-    let filename="Klassendiagramm.png";
-    let imageParsed=gtk::Image::new_from_file("Klassendiagramm.png");
-    parsedImage=imageParsed;
     
+ 
     
     let mut textFromDatei= String::new();
     let mut textFromDateiClone= textFromDatei.clone();
@@ -82,6 +80,9 @@ pub fn build_ui(application: &gtk::Application) {
     	let textTest=text_view_copy.get_buffer().expect("Couldn't get window").get_text(&startiter, &enditer, false);
     	//println!("{:#?}", textTest.unwrap());
         let filename = parseString(&textTest.unwrap());
+		
+		let path = Path::new(&filename);
+		parsedImage.set_from_file(path);
 //	println!("{}", &filename);
 
 //	parsedImageCopy=imageParsed;
