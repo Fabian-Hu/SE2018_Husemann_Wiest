@@ -230,16 +230,16 @@ fn calculateWeighting(objList: &mut Vec<lib::Object>, relaList: &Vec<lib::Relati
 		let mut tempName = objList[tempToIndex].name.clone();
 		objList[tempFromIndex].addChild(tempName);
 
-		if objList[tempFromIndex].weighting == 1 && objList[tempToIndex].weighting == 1 {
+		if objList[tempFromIndex].weighting == 99999 && objList[tempToIndex].weighting == 99999 {
 			objList[tempFromIndex].setWeighting(10);
 			objList[tempToIndex].setWeighting(0);
-		}else if objList[tempFromIndex].weighting != 1 && objList[tempToIndex].weighting == 1 {
+		}else if objList[tempFromIndex].weighting != 99999 && objList[tempToIndex].weighting == 99999 {
 			let mut tempValue = objList[tempFromIndex].weighting.clone();		
 			objList[tempToIndex].setWeighting(tempValue - 10);
-		}else if objList[tempFromIndex].weighting == 1 && objList[tempToIndex].weighting != 1 {
+		}else if objList[tempFromIndex].weighting == 99999 && objList[tempToIndex].weighting != 99999 {
 			let mut tempValue = objList[tempToIndex].weighting.clone();
 			objList[tempFromIndex].setWeighting(tempValue+10);
-		}else if objList[tempFromIndex].weighting != 1 && objList[tempToIndex].weighting != 1 {
+		}else if objList[tempFromIndex].weighting != 99999 && objList[tempToIndex].weighting != 99999 {
 			let mut tempFromW = objList[tempFromIndex].weighting.clone();
 			let mut tempToW = objList[tempToIndex].weighting.clone();
 			let mut tempDiff = tempFromW - tempToW - 10;		
