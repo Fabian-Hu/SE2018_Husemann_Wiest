@@ -17,6 +17,40 @@ Object
 	/Attribut	
 /Object
 Object
+	Name: Wand
+	Attribut
+		Name: Breite
+		Typ: Integer
+	/Attribut	
+	Attribut
+		Name: Höhe
+		Typ: Integer
+		Wert: 10
+	/Attribut
+	Attribut
+		Name: Farbe
+		Typ: Color
+		Wert: RED
+	/Attribut	
+/Object
+Object
+	Name: Golden_Retriever
+	Attribut
+		Name: Breite
+		Typ: Integer
+	/Attribut	
+	Attribut
+		Name: Höhe
+		Typ: Integer
+		Wert: 10
+	/Attribut
+	Attribut
+		Name: Farbe
+		Typ: Color
+		Wert: RED
+	/Attribut	
+/Object
+Object
 	Name: Hund
 	Attribut
 		Name: Farbe
@@ -170,6 +204,12 @@ Relation
 /Relation
 Relation
 	Description: Ein Hund ist ein Tier
+	Typ: Vererbung
+	From: Hund
+	To: Golden_Retriever
+/Relation
+Relation
+	Description: Ein Hund ist ein Tier
 	Typ: Aggregation
 	From: Hund
 	To: Katze
@@ -186,3 +226,4 @@ Relation
 	From: Vogel
 	To: Specht
 /Relation
+

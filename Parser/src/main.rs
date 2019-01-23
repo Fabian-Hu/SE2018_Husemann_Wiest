@@ -83,10 +83,6 @@ pub fn build_ui(application: &gtk::Application) {
 		
 		let path = Path::new(&filename);
 		parsedImage.set_from_file(path);
-//	println!("{}", &filename);
-
-//	parsedImageCopy=imageParsed;
-	
 
     });
     
@@ -157,9 +153,11 @@ fn parseString(s: &String) -> String{
 				lineCount = relaHelper.count;
 			}
 			else {
-				print!("Fehler in der Datei an der Zeile: ");
-				print!("{} ",&(lineCount+1).to_string());
-				println!("{} ",&strings[lineCount].to_string());
+				let mut errorMsg = String::new();
+				errorMsg.push_str("Fehler in der Datei an der Zeile: ");
+				errorMsg.push_str(&(lineCount+1).to_string());
+				errorMsg.push_str(&strings[lineCount].to_string());
+				errorMessage(&errorMsg);
 				errorCounter = 1;
 			}			
 		} else if diagramTyp == "Usecasediagramm" {
@@ -184,9 +182,11 @@ fn parseString(s: &String) -> String{
 				system.push(sysHelper.system);				
 				lineCount = sysHelper.count;
 			}else {
-				print!("Fehler in der Datei an der Zeile: ");
-				print!("{} ",&(lineCount+1).to_string());
-				println!("{} ",&strings[lineCount].to_string());
+				let mut errorMsg = String::new();
+				errorMsg.push_str("Fehler in der Datei an der Zeile: ");
+				errorMsg.push_str(&(lineCount+1).to_string());
+				errorMsg.push_str(&strings[lineCount].to_string());
+				errorMessage(&errorMsg);
 				errorCounter = 1;
 			}
 		}
