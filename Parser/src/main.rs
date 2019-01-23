@@ -45,7 +45,10 @@ pub fn build_ui(application: &gtk::Application) {
                                               .expect("Couldn't get builder");
     let mut parsedImage: gtk::Image = builder.get_object("parsedImage")
                                               .expect("Couldn't get builder");
-    let imageParsed=gtk::Image::new_from_file("test.png");
+    let filename="Klassendiagramm.png";
+    let imageParsed=gtk::Image::new_from_file("Klassendiagramm.png");
+    parsedImage=imageParsed;
+    
     
     let mut textFromDatei= String::new();
     let mut textFromDateiClone= textFromDatei.clone();
@@ -72,16 +75,20 @@ pub fn build_ui(application: &gtk::Application) {
         file_chooser.destroy();
     });
     let counter=0;
+    
     parse_button.connect_clicked(move |_| {
     	let startiter=text_view_copy.get_buffer().expect("Couldn't get window").get_start_iter();
     	let enditer=text_view_copy.get_buffer().expect("Couldn't get window").get_end_iter();
     	let textTest=text_view_copy.get_buffer().expect("Couldn't get window").get_text(&startiter, &enditer, false);
     	//println!("{:#?}", textTest.unwrap());
-        parseString(&textTest.unwrap());
+        let filename = parseString(&textTest.unwrap());
+//	println!("{}", &filename);
 
+//	parsedImageCopy=imageParsed;
+	
 
     });
-    parsedImage=imageParsed;
+    
     window.connect_delete_event(|win, _| {
         win.destroy();
         Inhibit(false)
@@ -98,7 +105,7 @@ fn errorMessage(s: &String) {
 }
 
 
-fn parseString(s: &String) {
+fn parseString(s: &String) -> String{
 	let mut lineCount = 0;
     let mut strings = vec![];	
 	
@@ -185,7 +192,7 @@ fn parseString(s: &String) {
 		lineCount = lineCount + 1;
     }
 	
-
+	let mut filename = "";
 	if errorCounter == 0 {	
 		if diagramTyp == "Klassendiagramm" {
 			calculateWeighting(&mut objList,&relaList);
@@ -194,11 +201,15 @@ fn parseString(s: &String) {
 				println!("{} Gewicht: {}",obj.name,obj.weighting);
 			}*/		
 			draw::drawClassDiagram("Klassendiagramm.png".to_string(),&mut objList,&relaList);
+			filename = "Klassendiagramm.png";			
 		}else if diagramTyp == "Usecasediagramm"{
 			draw::drawUseCaseDiagram("UseCaseDiagramm.png".to_string(),&akteur,&system);
+			filename = "UseCaseDiagramm.png";			
 		}
-		println!("Der Parser war Erfolgreich");
-	}	
+		errorMessage(&"Der Parser war Erfolgreich".to_string());
+	}
+
+	return filename.to_string();	
 }
 
 fn calculateWeighting(objList: &mut Vec<lib::Object>, relaList: &Vec<lib::RelationObject>) {	
