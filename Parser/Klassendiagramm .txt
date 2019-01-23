@@ -51,6 +51,17 @@ Object
 	/Function
 /Object
 Object
+	Name: Maulwurf
+	Attribut
+		Name: Krallen
+		Typ: Long
+	/Attribut
+	Attribut
+		Name: Farbe
+		Typ: Color
+	/Attribut
+/Object
+Object
 	Name: Vogel
 	Attribut
 		Name: Farbe
@@ -98,6 +109,47 @@ Object
 		Return: void
 	/Function
 /Object
+Object
+	Name: Kleine_Meise
+	Attribut
+		Name: Größe
+		Typ: Integer
+	/Attribut
+	Attribut
+		Name: Farbe
+		Typ: Color
+		Wert: YELLOW
+	/Attribut
+/Object
+Object
+	Name: Große_Meise
+	Attribut
+		Name: Größe
+		Typ: Integer
+	/Attribut
+	Attribut
+		Name: Flügelspanne
+		Typ: Float
+		Wert: 2.0
+	/Attribut
+	Attribut
+		Name: Farbe
+		Typ: Color
+		Wert: YELLOW
+	/Attribut
+/Object
+Relation
+	Description: Ein Hund ist ein Tier
+	Typ: Kennt
+	From: Meise
+	To: Große_Meise
+/Relation
+Relation
+	Description: Ein Hund ist ein Tier
+	Typ: Vererbung
+	From: Meise
+	To: Kleine_Meise
+/Relation
 Relation
 	Description: Ein Hund ist ein Tier
 	Typ: Vererbung
@@ -106,13 +158,13 @@ Relation
 /Relation
 Relation
 	Description: Ein Hund ist ein Tier
-	Typ: Aggregation
+	Typ: Abhängigkeit
 	From: Katze
 	To: Vogel
 /Relation
 Relation
 	Description: Ein Hund ist ein Tier
-	Typ: Vererbung
+	Typ: Kennt
 	From: Vogel
 	To: Meise
 /Relation
@@ -124,7 +176,7 @@ Relation
 /Relation
 Relation
 	Description: Ein Hund ist ein Tier
-	Typ: Vererbung
+	Typ: Abhängigkeit
 	From: Tier
 	To: Hund
 /Relation

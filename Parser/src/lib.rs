@@ -2,7 +2,7 @@ pub enum RelaTyp {
 	Fehler,
 	Vererbung,
 	Kennt,
-	Abhaengigkeit,	
+	Abhaengig,	
 	Aggregation,
 }
 

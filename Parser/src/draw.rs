@@ -82,7 +82,7 @@ pub fn draw_dashed_line_with(image: &mut RgbImage, lokalXFrom: f32, lokalXTo: f3
 	let mut altVec = vec![lokalXFrom,lokalYFrom];
 	for x in 0..len as i32{		
 		let newVec = vec![((altVec[0]) + unitVec[0]),((altVec[1]) + unitVec[1])];
-		if x % 2 > 0 {			
+		if x % 2 > 0 && x > 3{			
 			draw_line_segment_mut(&mut *image, (newVec[0] as f32, newVec[1] as f32), (altVec[0] as f32, altVec[1] as f32), black);
 		}
 		altVec = newVec;
@@ -227,9 +227,9 @@ pub fn drawObject(image: &mut RgbImage,x: f32, y:f32,obj: &lib::Object) -> lib::
 	return drawHelper;
 }
 
-pub fn drawClassDiagram(path: String, objList: &mut Vec<lib::Object>, relaList: &Vec<lib::RelationObject>) {
-	let path = Path::new(&path);
-    let white = Rgb([255u8, 255u8, 255u8]);
+pub fn drawClassDiagram(filename: String, objList: &mut Vec<lib::Object>, relaList: &Vec<lib::RelationObject>) {
+	let path = Path::new(&filename);
+    	let white = Rgb([255u8, 255u8, 255u8]);
 	let red = Rgb([255u8, 0u8, 0u8]);
 	let black = Rgb([0u8, 0u8, 0u8]);
 	
@@ -246,6 +246,8 @@ pub fn drawClassDiagram(path: String, objList: &mut Vec<lib::Object>, relaList: 
 	
 	println!();
 	println!("Sorting...");
+
+	let mut height:f32 = 0.0;
 
 	for i in 0..objList.len(){	
 		println!("{} Gewicht: {}",objList[i].name,objList[i].weighting);
@@ -266,16 +268,23 @@ pub fn drawClassDiagram(path: String, objList: &mut Vec<lib::Object>, relaList: 
 			println!("next: {} temp: {}",objList[i+1].weighting,objList[i].weighting);
 			if objList[i+1].weighting == objList[i].weighting{
 				x = x + helper.lenght + 10.0;
+				if height < helper.height {
+					height = helper.height;
+				}
 			}else if objList[i+1].weighting < objList[i].weighting{
+				if height == 0.0 {
+					height = helper.height;
+				}
 				x = 40.0;
-				y = y + helper.height + 60.0;
+				y = y + height + 80.0;
+				height = 0.0;
 			}
+			println!("{} height",height);
 		}
 	}
 
 	
-	/*for rela in relaList.iter() {
-		println!("Relas");
+	for rela in relaList.iter() {
 		let mut errorJoin = lib::objectJoins{
 			upperJoinX: 0.0,
 	 		upperJoinY: 0.0,
@@ -293,17 +302,16 @@ pub fn drawClassDiagram(path: String, objList: &mut Vec<lib::Object>, relaList: 
 		match Cordinates.get(&rela.from) {
         	Some(join) => fromJoin = &join,
         	_ => println!(),
-    	}
-		println!("{}",fromJoin.lowerJoinX);
+    	}		
 		match rela.typ{
 			lib::RelaTyp::Vererbung => draw_line_with(&mut image,fromJoin.lowerJoinX, toJoin.upperJoinX, fromJoin.lowerJoinY ,toJoin.upperJoinY),
 			lib::RelaTyp::Kennt => draw_line_segment_mut(&mut image, (fromJoin.lowerJoinX, fromJoin.lowerJoinY), (toJoin.upperJoinX, toJoin.upperJoinY), black),
-			lib::RelaTyp::Abhaengigkeit => draw_dashed_line_with(&mut image,fromJoin.lowerJoinX, toJoin.upperJoinX, fromJoin.lowerJoinY ,toJoin.upperJoinY),
+			lib::RelaTyp::Abhaengig => draw_dashed_line_with(&mut image,fromJoin.lowerJoinX, toJoin.upperJoinX, fromJoin.lowerJoinY ,toJoin.upperJoinY),
 			lib::RelaTyp::Aggregation => draw_line_with_aggregation(&mut image,fromJoin.lowerJoinX, toJoin.upperJoinX, fromJoin.lowerJoinY ,toJoin.upperJoinY),
 			_ => println!("Es ist ein Fehler beim Zeichnen bei den Relationen"),
 		}		
 		
-	}*/
+	}
 
 	image.save(path).unwrap();
 }

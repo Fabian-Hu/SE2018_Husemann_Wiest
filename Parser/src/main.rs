@@ -173,17 +173,16 @@ fn parseString(s: &String) {
 	if errorCounter == 0 {	
 		if diagramTyp == "Klassendiagramm" {
 			calculateWeighting(&mut objList,&relaList);
-			println!();	
+			/*println!();	
 			for obj in objList.iter() {
 				println!("{} Gewicht: {}",obj.name,obj.weighting);
-			}		
+			}*/		
 			draw::drawClassDiagram("Klassendiagramm.png".to_string(),&mut objList,&relaList);
 		}else if diagramTyp == "Usecasediagramm"{
 			draw::drawUseCaseDiagram("UseCaseDiagramm.png".to_string(),&akteur,&system);
 		}
-	}
-
-	println!("Der Parser war Erfolgreich");
+		println!("Der Parser war Erfolgreich");
+	}	
 }
 
 fn calculateWeighting(objList: &mut Vec<lib::Object>, relaList: &Vec<lib::RelationObject>) {	
@@ -221,8 +220,8 @@ fn calculateWeighting(objList: &mut Vec<lib::Object>, relaList: &Vec<lib::Relati
 			addAllWeight(objList,tempDiff,tempToIndex);
 		}
 
-		println!("{} Aktuelles Gewicht: {}",objList[tempFromIndex].name,objList[tempFromIndex].weighting);
-		println!("{} Aktuelles Gewicht: {}",objList[tempToIndex].name,objList[tempToIndex].weighting);
+		//println!("{} Aktuelles Gewicht: {}",objList[tempFromIndex].name,objList[tempFromIndex].weighting);
+		//println!("{} Aktuelles Gewicht: {}",objList[tempToIndex].name,objList[tempToIndex].weighting);
 	}		
 }
 
@@ -406,8 +405,8 @@ fn createRelation(line: &Vec<&str>,lineCount: &usize, objList: &Vec<lib::Object>
 		rela_typ = lib::RelaTyp::Vererbung;
 	}else if relaTyp.contains("Kennt"){
 		rela_typ = lib::RelaTyp::Kennt;
-	}else if relaTyp.contains("Abhängigkeit"){
-		rela_typ = lib::RelaTyp::Abhaengigkeit;
+	}else if relaTyp.contains("Abhängig"){
+		rela_typ = lib::RelaTyp::Abhaengig;
 	}else if relaTyp.contains("Aggregation"){
 		rela_typ = lib::RelaTyp::Aggregation;
 	}
