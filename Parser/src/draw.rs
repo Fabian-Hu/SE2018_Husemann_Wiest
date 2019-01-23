@@ -244,13 +244,12 @@ pub fn drawClassDiagram(filename: String, objList: &mut Vec<lib::Object>, relaLi
 	
 	let mut Cordinates = HashMap::new();
 	
-	println!();
-	println!("Sorting...");
+
 
 	let mut height:f32 = 0.0;
 
 	for i in 0..objList.len(){	
-		println!("{} Gewicht: {}",objList[i].name,objList[i].weighting);
+		//println!("{} Gewicht: {}",objList[i].name,objList[i].weighting);
 		let helper = drawObject(&mut image,x,y,&objList[i]);
 
 		let middle = (x as i32) +((helper.lenght as i32)/2);
@@ -265,7 +264,7 @@ pub fn drawClassDiagram(filename: String, objList: &mut Vec<lib::Object>, relaLi
 		Cordinates.insert(objList[i].name.to_string(),objectJoins);
 
 		if i != objList.len()-1 {
-			println!("next: {} temp: {}",objList[i+1].weighting,objList[i].weighting);
+			//println!("next: {} temp: {}",objList[i+1].weighting,objList[i].weighting);
 			if objList[i+1].weighting == objList[i].weighting{
 				x = x + helper.lenght + 10.0;
 				if height < helper.height {
@@ -279,7 +278,7 @@ pub fn drawClassDiagram(filename: String, objList: &mut Vec<lib::Object>, relaLi
 				y = y + height + 80.0;
 				height = 0.0;
 			}
-			println!("{} height",height);
+			//println!("{} height",height);
 		}
 	}
 

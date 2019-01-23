@@ -587,7 +587,7 @@ fn createObject(line: &Vec<&str>,lineCount: &usize) -> lib::ObjectHelper {
 		name: objname.to_string(),
 		attributes: attrs,
 		functions: funcs,
-		weighting: 1,
+		weighting: 99999,
 		child: children,
 	};
 
