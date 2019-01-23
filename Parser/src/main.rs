@@ -12,6 +12,7 @@ use std::fs::File;
 use std::env;
 use std::io::prelude::*;
 use std::path::Path;
+use gtk::{ButtonsType, DialogFlags, MessageType, MessageDialog, Window};
 mod lib;
 mod draw;
 
@@ -77,6 +78,8 @@ pub fn build_ui(application: &gtk::Application) {
     	let textTest=text_view_copy.get_buffer().expect("Couldn't get window").get_text(&startiter, &enditer, false);
     	//println!("{:#?}", textTest.unwrap());
         parseString(&textTest.unwrap());
+
+
     });
     parsedImage=imageParsed;
     window.connect_delete_event(|win, _| {
@@ -85,6 +88,15 @@ pub fn build_ui(application: &gtk::Application) {
     });
     window.show_all();
 }
+
+fn errorMessage(s: &String) {
+         MessageDialog::new(None::<&Window>,
+                       DialogFlags::empty(),
+                       MessageType::Info,
+                       ButtonsType::Ok,
+                       s).run();
+}
+
 
 fn parseString(s: &String) {
 	let mut lineCount = 0;
@@ -118,7 +130,8 @@ fn parseString(s: &String) {
 			if strings[lineCount].contains("Object") {
 				let objHelper = createObject(&strings,&lineCount);
 				if objHelper.errorCount != 0 {
-					print!("{}",objHelper.errorMsg);
+					//print!("{}",objHelper.errorMsg);
+					errorMessage(&objHelper.errorMsg);
 					errorCounter = 1;
 				}
 				println!("");
@@ -128,7 +141,8 @@ fn parseString(s: &String) {
 			else if strings[lineCount].contains("Relation") {
 				let relaHelper = createRelation(&strings,&lineCount,&objList);
 				if relaHelper.errorCount != 0 {
-					print!("{}",relaHelper.errorMsg);
+					//print!("{}",relaHelper.errorMsg);
+					errorMessage(&relaHelper.errorMsg); 
 					errorCounter = 1;
 				}
 				relaList.push(relaHelper.relation);
@@ -144,7 +158,8 @@ fn parseString(s: &String) {
 			if strings[lineCount].contains("Akteur") {
 				let aktHelper = createAkteur(&strings,&lineCount);
 				if aktHelper.errorCount != 0 {
-					print!("{}",aktHelper.errorMsg);
+					//print!("{}",aktHelper.errorMsg);
+					errorMessage(&aktHelper.errorMsg);
 					errorCounter = 1;
 				}
 				println!("");
@@ -153,7 +168,8 @@ fn parseString(s: &String) {
 			}else if strings[lineCount].contains("System") {
 				let sysHelper = createSystem(&strings,&lineCount);
 				if sysHelper.errorCount != 0 {
-					print!("{}",sysHelper.errorMsg);
+					//print!("{}",sysHelper.errorMsg);
+					errorMessage(&sysHelper.errorMsg);
 					errorCounter = 1;
 				}
 				println!("");
