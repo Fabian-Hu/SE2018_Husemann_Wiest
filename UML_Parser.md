@@ -54,6 +54,12 @@ Die Software wurde in der Programmiersprache Rust umgesetzt. Zur Erstellung von 
     | From:        | Name des Objektes bei dem die Beziehung startet | String        |
     | To:          | Name des Objektes bei dem die Beziehung endet   | String        |
 
+Relationstypen können sein:
+* Vererbung
+* Kennt
+* Abhängig
+* Aggregation
+
 ##### Beispiel für die textuelle Strukturierung
 ```xml
 Object

@@ -1,0 +1,4 @@
+1. Wechseln in das Verzeichnis /src
+2. folgenden Befehl ausführen "cargo run"
+3. Textdatei auswählen über den Open Button
+4. Parse wählen
